@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helios Prime</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <canvas id="particle-canvas"></canvas>
+
+    <nav class="side-panel">
+        <div class="panel-top">
+            <a href="index.html" class="panel-link"><i class="fa-solid fa-house"></i> <span
+                    data-translate="P_HOME">Acasă</span></a>
+            <a href="register.html" class="panel-link"><i class="fa-solid fa-user-plus"></i> <span
+                    data-translate="P_PROFILE">Crează-ți profilul</span></a>
+            <a href="#" class="panel-link"><i class="fa-solid fa-user"></i> <span
+                    data-translate="P_ACCOUNT">Cont</span></a>
+            <a href="recipes.html" class="panel-link"><i class="fa-solid fa-utensils"></i> <span data-translate="P_RECIPES">Rețete</span></a>
+        </div>
+        <div class="panel-bottom">
+            <div id="settingsPanel" class="settings-sub-panel" style="display: none; flex-direction: column; gap: 0.5rem; margin-bottom: 0.5rem; padding-left: 0.5rem;">
+                <div class="lang-switch mobile-lang-switch" style="display: none; border: none; padding: 0.4rem 0.8rem;">
+                    <button id="langRoMobile" class="lang-btn active">RO</button>
+                    <span class="lang-divider">|</span>
+                    <button id="langEnMobile" class="lang-btn">EN</button>
+                </div>
+                <a href="#" class="panel-link" id="themeToggleBtn"><i class="fa-solid fa-circle-half-stroke"></i> <span data-translate="P_THEME">Site Theme</span></a>
+                <a href="#" class="panel-link"><i class="fa-solid fa-crown"></i> <span data-translate="P_SUBSCRIPTION">Subscription</span></a>
+                <a href="#" class="panel-link"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span data-translate="P_LOGOUT">Log out</span></a>
+            </div>
+            <a href="#" class="panel-link" id="settingsBtn"><i class="fa-solid fa-gear"></i> <span
+                    data-translate="P_SETTINGS">Settings</span></a>
+        </div>
+    </nav>
+
+    <div class="wrapper">
+        <header>
+            <div class="logo-container">
+                <img src="logo.jpg.png" alt="Helios Prime Logo" class="logo-icon">
+                <div class="logo-text">Helios Prime</div>
+            </div>
+            <div class="header-actions">
+                <div class="lang-switch desktop-lang-switch">
+                    <button id="langRo" class="lang-btn active">RO</button>
+                    <span class="lang-divider">|</span>
+                    <button id="langEn" class="lang-btn">EN</button>
+                </div>
+                <a href="#" class="login-btn" data-translate="LOGIN">Log in</a>
+                <a href="#" id="mobileMenuBtn" class="mobile-settings-btn" style="display: none; color: var(--text-primary); font-size: 1.5rem; margin-left: 10px;"><i class="fa-solid fa-bars"></i></a>
+            </div>
+        </header>
+
+        <main>
+            <div class="hero-content">
+                <div class="text-section">
+                    <h1 data-translate="TITLE">Cucerește-ți<br>corpul.</h1>
+                    <p class="subtitle" data-translate="SUBTITLE">Aplicația cu care îți îndeplinesti visurile.</p>
+                    <div class="hero-btns">
+                        <a href="register.html" class="cta-button primary-btn" id="startBtn" data-translate="START_BTN"
+                            style="text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center;">CREAZA-ȚI
+                            PROFILUL</a>
+                        <button class="cta-button" id="aboutBtn" data-translate="CTA">CE FACE APLICAȚIA?</button>
+                    </div>
+
+                    <div class="dynamic-content">
+                        <div id="aboutBox" class="info-rectangle" style="display: none;">
+                            <p data-translate="ABOUT">Aplicația te ajută la a ține cont de caloriile pe care le consumi
+                                și la a te ajuta să-ți creezi un plan de workout!</p>
+                        </div>
+
+                        <div class="features-row" id="featuresRow">
+                            <div class="feature-card" id="caloriiBtn">
+                                <div class="card-tab"><span class="card-num">1</span></div>
+                                <div class="card-body">
+                                    <i class="fa-solid fa-apple-whole card-icon"></i>
+                                    <span class="card-text" data-translate="F1">MONITORIZARE<br>CALORII</span>
+                                </div>
+                            </div>
+
+                            <div id="caloriiBox" class="info-rectangle"
+                                style="display: none; margin: 0; flex: 1; min-height: 100px; padding: 1.5rem; justify-content: center; align-items: center;">
+                                <p data-translate="CALORII_INFO">Aplicația îți ține cont de ce mănânci și îți calculeaza
+                                    caloriile in/out.</p>
+                            </div>
+
+                            <div class="feature-card" id="workoutBtn">
+                                <div class="card-tab"><span class="card-num">2</span></div>
+                                <div class="card-body">
+                                    <i class="fa-solid fa-dumbbell card-icon"></i>
+                                    <span class="card-text" data-translate="F2">WORKOUT<br>PLAN</span>
+                                </div>
+                            </div>
+
+                            <div id="workoutBox" class="info-rectangle"
+                                style="display: none; margin: 0; flex: 1; min-height: 100px; padding: 1.5rem; justify-content: center; align-items: center;">
+                                <p data-translate="WORKOUT_INFO">Aplicația îți oferă planuri pentru workout și
+                                    posibilitatea de a îți putea schimba manual ce exerciții să faci!</p>
+                            </div>
+                            <div class="feature-card" id="istoricBtn">
+                                <div class="card-tab"><span class="card-num">3</span></div>
+                                <div class="card-body">
+                                    <i class="fa-solid fa-stopwatch card-icon"></i>
+                                    <span class="card-text" data-translate="F3">ISTORIC<br>ANTRENAMENTE</span>
+                                </div>
+                            </div>
+
+                            <div id="istoricBox" class="info-rectangle"
+                                style="display: none; margin: 0; flex: 1; min-height: 100px; padding: 1.5rem; justify-content: center; align-items: center;">
+                                <p data-translate="ISTORIC_INFO">În aplicație poți găsii un calendar in care poți vedea
+                                    în ce zile te-ai antrenat și cu cât ai mai mare WORKOUT STREAK-ul primesc discount
+                                    la viitoarele abonamente!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="image-section">
+                    <a href="#" class="app-store-btn">
+                        <i class="fa-brands fa-apple"></i>
+                        <div class="app-store-text">
+                            <span class="download-text">Download on the</span>
+                            <span class="store-text">App Store</span>
+                        </div>
+                    </a>
+                    <div class="mockup-container">
+                        <img src="phones_mockup.png" alt="Helios Prime App Interface" class="phones-image"
+                            id="mockupImage">
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

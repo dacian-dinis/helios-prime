@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helios Prime - Creare Profil</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="wrapper" style="margin: 0 auto; padding-left: 3%; padding-right: 3%; max-width: 1200px;">
+        <header style="justify-content: flex-start; padding-top: 1rem;">
+            <a href="index.html" class="logo-container" style="text-decoration: none;">
+                <img src="logo.jpg.png" alt="Helios Prime Logo" class="logo-icon" style="width: 180px; max-height: 100px; margin-bottom: -40px; margin-top: -20px;">
+                <div class="logo-text" style="font-size: 1.5rem;">Helios Prime</div>
+            </a>
+        </header>
+
+        <main style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; min-height: 70vh; padding: 2rem;">
+            
+            <!-- Step 1: Gender -->
+            <div id="step-1" style="width: 100%; display: flex; flex-direction: column; align-items: center; animation: fadeIn 0.4s ease-out;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Sexul</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Folosit pentru a calcula corect rata metabolică</p>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 420px; margin-bottom: 3rem;">
+                    <!-- Male Option -->
+                    <label class="gender-option">
+                        <input type="radio" name="gender" value="male" class="gender-radio">
+                        <div class="gender-card">
+                            <div class="gender-icon male-icon"><i class="fa-solid fa-mars"></i></div>
+                            <span class="gender-label" style="flex: 1; text-align: left;">Bărbat</span>
+                        </div>
+                    </label>
+                    
+                    <!-- Female Option -->
+                    <label class="gender-option">
+                        <input type="radio" name="gender" value="female" class="gender-radio">
+                        <div class="gender-card">
+                            <div class="gender-icon female-icon"><i class="fa-solid fa-venus"></i></div>
+                            <span class="gender-label" style="flex: 1; text-align: left;">Femeie</span>
+                        </div>
+                    </label>
+                </div>
+
+                <button class="cta-button primary-btn" type="button" onclick="nextStep(1)" style="width: 100%; max-width: 420px; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body);">Continuă</button>
+            </div>
+
+            <!-- Step 2: Date of Birth -->
+            <div id="step-2" style="width: 100%; display: none; flex-direction: column; align-items: center; animation: fadeIn 0.4s ease-out;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Data nașterii</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Ne ajută să personalizăm recomandările pentru tine</p>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; gap: 1rem; width: 100%; max-width: 420px; margin-bottom: 3rem;">
+                    <input type="number" placeholder="ZZ" class="dob-input" min="1" max="31">
+                    <input type="number" placeholder="LL" class="dob-input" min="1" max="12">
+                    <input type="number" placeholder="AAAA" class="dob-input" min="1900" max="2026">
+                </div>
+
+                <div style="display: flex; gap: 1rem; width: 100%; max-width: 420px;">
+                    <button class="cta-button" type="button" onclick="prevStep(2)" style="flex: 0.4; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Înapoi
+                    </button>
+                    <button class="cta-button primary-btn" type="button" onclick="nextStep(2)" style="flex: 0.6; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Continuă
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Current Measurements -->
+            <div id="step-3" style="width: 100%; display: none; flex-direction: column; align-items: center; animation: fadeIn 0.4s ease-out;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Măsurători actuale</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Care sunt măsurătorile tale curente?</p>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 420px; margin-bottom: 3rem;">
+                    <div style="display: flex; gap: 1rem; width: 100%;">
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label style="color: var(--text-secondary); font-size: 0.9rem; margin-left: 0.5rem;">Înălțime (cm)</label>
+                            <input type="number" placeholder="ex: 180" class="dob-input" min="50" max="250" style="width: 100%;">
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label style="color: var(--text-secondary); font-size: 0.9rem; margin-left: 0.5rem;">Greutate (kg)</label>
+                            <input type="number" id="current-weight" placeholder="ex: 75" class="dob-input" min="30" max="300" style="width: 100%;">
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label style="color: var(--text-secondary); font-size: 0.9rem; margin-left: 0.5rem;">Procentaj grăsime corporală (Opțional %)</label>
+                        <input type="number" placeholder="ex: 15" class="dob-input" min="1" max="100" style="width: 100%;">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; width: 100%; max-width: 420px;">
+                    <button class="cta-button" type="button" onclick="prevStep(3)" style="flex: 0.4; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Înapoi
+                    </button>
+                    <button class="cta-button primary-btn" type="button" onclick="nextStep(3)" style="flex: 0.6; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Continuă
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 4: Primary Goal -->
+            <div id="step-4" style="width: 100%; display: none; flex-direction: column; align-items: center; animation: fadeIn 0.4s ease-out;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Obiectiv principal</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Care este obiectivul tău de greutate?</p>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 420px; margin-bottom: 3rem;">
+                    <!-- Lose weight -->
+                    <label class="gender-option">
+                        <input type="radio" name="goal" value="lose" class="gender-radio">
+                        <div class="gender-card">
+                            <div class="gender-icon" style="color: #ff6b6b; background: rgba(255, 107, 107, 0.15);"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                            <span class="gender-label" style="flex: 1; text-align: left;">Slăbire</span>
+                        </div>
+                    </label>
+                    
+                    <!-- Maintain weight -->
+                    <label class="gender-option">
+                        <input type="radio" name="goal" value="maintain" class="gender-radio">
+                        <div class="gender-card">
+                            <div class="gender-icon" style="color: #FFD700; background: rgba(255, 215, 0, 0.15);"><i class="fa-solid fa-scale-balanced"></i></div>
+                            <span class="gender-label" style="flex: 1; text-align: left;">Menținere</span>
+                        </div>
+                    </label>
+
+                    <!-- Gain weight -->
+                    <label class="gender-option">
+                        <input type="radio" name="goal" value="gain" class="gender-radio">
+                        <div class="gender-card">
+                            <div class="gender-icon" style="color: #4da6ff; background: rgba(77, 166, 255, 0.15);"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                            <span class="gender-label" style="flex: 1; text-align: left;">Creștere în masă</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 1rem; width: 100%; max-width: 420px;">
+                    <button class="cta-button" type="button" onclick="prevStep(4)" style="flex: 0.4; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Înapoi
+                    </button>
+                    <button class="cta-button primary-btn" type="button" onclick="nextStep(4)" style="flex: 0.6; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Continuă
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 5: Target Weight -->
+            <div id="step-5" style="width: 100%; display: none; flex-direction: column; align-items: center; animation: fadeIn 0.4s ease-out;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Greutate țintă</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Care este greutatea ta țintă?</p>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 420px; margin-bottom: 3rem;">
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label style="color: var(--text-secondary); font-size: 0.9rem; margin-left: 0.5rem;">Greutate țintă (kg)</label>
+                        <input type="number" id="target-weight-input" placeholder="ex: 70" class="dob-input" min="30" max="300" style="width: 100%;" oninput="showValidationPrompt()">
+                        <div id="weight-validation-prompt" style="background: rgba(77, 166, 255, 0.1); border: 1px solid rgba(77, 166, 255, 0.2); padding: 1rem; border-radius: 8px; color: #4da6ff; font-size: 0.95rem; margin-top: 0.5rem; display: none; transition: opacity 0.3s ease-in-out;">
+                            <i class="fa-solid fa-robot" style="margin-right: 8px;"></i> <span id="validation-message"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; width: 100%; max-width: 420px;">
+                    <button class="cta-button" type="button" onclick="prevStep(5)" style="flex: 0.4; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Înapoi
+                    </button>
+                    <button class="cta-button primary-btn" type="button" onclick="nextStep(5)" style="flex: 0.6; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Continuă
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 6: Pace / Speed -->
+            <div id="step-6" style="width: 100%; display: none; flex-direction: column; align-items: center; animation: fadeIn 0.4s ease-out;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Ritmul dorit</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Cât de repede vrei să îți atingi obiectivul?</p>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 420px; margin-bottom: 3rem;">
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <input type="range" id="pace-slider" min="1" max="3" value="2" step="1" style="width: 100%; accent-color: var(--primary-color);" oninput="updatePace()">
+                        <div style="display: flex; justify-content: space-between; color: var(--text-secondary); font-size: 0.85rem; padding: 0 5px;">
+                            <span>Lent</span>
+                            <span>Recomandat</span>
+                            <span>Rapid</span>
+                        </div>
+                        <div id="pace-feedback" style="background: rgba(77, 166, 255, 0.1); border: 1px solid rgba(77, 166, 255, 0.2); padding: 1rem; border-radius: 8px; color: #4da6ff; font-size: 0.95rem; margin-top: 1rem; text-align: center; transition: opacity 0.3s ease-in-out;">
+                            <i class="fa-solid fa-clock" style="margin-right: 8px;"></i> <span id="pace-message">Vei atinge obiectivul în aproximativ -- zile</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; width: 100%; max-width: 420px;">
+                    <button class="cta-button" type="button" onclick="prevStep(6)" style="flex: 0.4; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Înapoi
+                    </button>
+                    <button class="cta-button primary-btn" type="button" onclick="nextStep(6)" style="flex: 0.6; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Continuă
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 7: Activity Level -->
+            <div id="step-7" style="width: 100%; display: none; flex-direction: column; align-items: center; animation: fadeIn 0.4s ease-out;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Nivel de activitate</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Care este nivelul tău zilnic de activitate?</p>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 420px; margin-bottom: 3rem;">
+                    <label class="gender-option">
+                        <input type="radio" name="activity" value="sedentary" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <div class="gender-icon" style="color: #9e9e9e; background: rgba(158, 158, 158, 0.15); font-size: 1.2rem; width: 40px; height: 40px;"><i class="fa-solid fa-couch"></i></div>
+                            <div style="flex: 1; text-align: left; display: flex; flex-direction: column;">
+                                <span class="gender-label" style="font-size: 1.05rem;">Sedentar</span>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">Sub 5.000 de pași</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio" name="activity" value="light" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <div class="gender-icon" style="color: #4da6ff; background: rgba(77, 166, 255, 0.15); font-size: 1.2rem; width: 40px; height: 40px;"><i class="fa-solid fa-person-walking"></i></div>
+                            <div style="flex: 1; text-align: left; display: flex; flex-direction: column;">
+                                <span class="gender-label" style="font-size: 1.05rem;">Ușor activ</span>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">5.000 - 10.000 de pași</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio" name="activity" value="active" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <div class="gender-icon" style="color: #4caf50; background: rgba(76, 175, 80, 0.15); font-size: 1.2rem; width: 40px; height: 40px;"><i class="fa-solid fa-person-running"></i></div>
+                            <div style="flex: 1; text-align: left; display: flex; flex-direction: column;">
+                                <span class="gender-label" style="font-size: 1.05rem;">Activ</span>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">10.000+ pași</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio" name="activity" value="very-active" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <div class="gender-icon" style="color: #ff9800; background: rgba(255, 152, 0, 0.15); font-size: 1.2rem; width: 40px; height: 40px;"><i class="fa-solid fa-briefcase"></i></div>
+                            <div style="flex: 1; text-align: left; display: flex; flex-direction: column;">
+                                <span class="gender-label" style="font-size: 1.05rem;">Foarte activ</span>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">Job fizic / Efort intens</span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 1rem; width: 100%; max-width: 420px;">
+                    <button class="cta-button" type="button" onclick="prevStep(7)" style="flex: 0.4; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Înapoi
+                    </button>
+                    <button class="cta-button primary-btn" type="button" onclick="nextStep(7)" style="flex: 0.6; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Continuă
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 8: Workout Frequency -->
+            <div id="step-8" style="width: 100%; display: none; flex-direction: column; align-items: center; animation: fadeIn 0.4s ease-out;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Antrenamente</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Câte antrenamente faci pe săptămână?</p>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 420px; margin-bottom: 3rem;">
+                    <label class="gender-option">
+                        <input type="radio" name="workouts" value="0-2" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <div class="gender-icon" style="color: #9e9e9e; background: rgba(158, 158, 158, 0.15); font-size: 1.2rem; width: 40px; height: 40px;"><i class="fa-solid fa-battery-quarter"></i></div>
+                            <div style="flex: 1; text-align: left; display: flex; flex-direction: column;">
+                                <span class="gender-label" style="font-size: 1.05rem;">0-2</span>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">Din când în când</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio" name="workouts" value="3-5" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <div class="gender-icon" style="color: #4da6ff; background: rgba(77, 166, 255, 0.15); font-size: 1.2rem; width: 40px; height: 40px;"><i class="fa-solid fa-battery-half"></i></div>
+                            <div style="flex: 1; text-align: left; display: flex; flex-direction: column;">
+                                <span class="gender-label" style="font-size: 1.05rem;">3-5</span>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">Câteva pe săptămână</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio" name="workouts" value="6+" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <div class="gender-icon" style="color: #ff6b6b; background: rgba(255, 107, 107, 0.15); font-size: 1.2rem; width: 40px; height: 40px;"><i class="fa-solid fa-battery-full"></i></div>
+                            <div style="flex: 1; text-align: left; display: flex; flex-direction: column;">
+                                <span class="gender-label" style="font-size: 1.05rem;">6+</span>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">Atlet dedicat</span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 1rem; width: 100%; max-width: 420px;">
+                    <button class="cta-button" type="button" onclick="prevStep(8)" style="flex: 0.4; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Înapoi
+                    </button>
+                    <button class="cta-button primary-btn" type="button" onclick="nextStep(8)" style="flex: 0.6; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Continuă
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 9: Dietary Preferences -->
+            <div id="step-9" style="width: 100%; display: none; flex-direction: column; align-items: center; animation: fadeIn 0.4s ease-out;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Dietă vizată</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Urmezi o dietă specifică?</p>
+                </div>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; width: 100%; max-width: 500px; margin-bottom: 3rem; justify-content: center;">
+                    <label class="gender-option" style="width: 45%;">
+                        <input type="radio" name="diet" value="classic" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <span class="gender-label" style="font-size: 1rem; text-align: center; width: 100%;">Clasică</span>
+                        </div>
+                    </label>
+                    <label class="gender-option" style="width: 45%;">
+                        <input type="radio" name="diet" value="pescatarian" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <span class="gender-label" style="font-size: 1rem; text-align: center; width: 100%;">Pescatariană</span>
+                        </div>
+                    </label>
+                    <label class="gender-option" style="width: 45%;">
+                        <input type="radio" name="diet" value="vegetarian" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <span class="gender-label" style="font-size: 1rem; text-align: center; width: 100%;">Vegetariană</span>
+                        </div>
+                    </label>
+                    <label class="gender-option" style="width: 45%;">
+                        <input type="radio" name="diet" value="vegan" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <span class="gender-label" style="font-size: 1rem; text-align: center; width: 100%;">Vegană</span>
+                        </div>
+                    </label>
+                    <label class="gender-option" style="width: 45%;">
+                        <input type="radio" name="diet" value="keto" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <span class="gender-label" style="font-size: 1rem; text-align: center; width: 100%;">Keto</span>
+                        </div>
+                    </label>
+                    <label class="gender-option" style="width: 45%;">
+                        <input type="radio" name="diet" value="high-protein" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <span class="gender-label" style="font-size: 1rem; text-align: center; width: 100%;">Proteine</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 1rem; width: 100%; max-width: 420px;">
+                    <button class="cta-button" type="button" onclick="prevStep(9)" style="flex: 0.4; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Înapoi
+                    </button>
+                    <button class="cta-button primary-btn" type="button" onclick="nextStep(9)" style="flex: 0.6; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Continuă
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 10: Behavioral Obstacles -->
+            <div id="step-10" style="width: 100%; display: none; flex-direction: column; align-items: center; animation: fadeIn 0.4s ease-out;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Obstacole</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Ce te oprește cel mai des să îți atingi obiectivele?</p>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 420px; margin-bottom: 3rem;">
+                    <label class="gender-option">
+                        <input type="checkbox" name="obstacle" value="consistency" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <span class="gender-label" style="font-size: 1.05rem; text-align: left; width: 100%;">Lipsa consecvenței</span>
+                        </div>
+                    </label>
+                    <label class="gender-option">
+                        <input type="checkbox" name="obstacle" value="unhealthy-habits" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <span class="gender-label" style="font-size: 1.05rem; text-align: left; width: 100%;">Obiceiuri alimentare nesănătoase</span>
+                        </div>
+                    </label>
+                    <label class="gender-option">
+                        <input type="checkbox" name="obstacle" value="busy-schedule" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <span class="gender-label" style="font-size: 1.05rem; text-align: left; width: 100%;">Program aglomerat</span>
+                        </div>
+                    </label>
+                    <label class="gender-option">
+                        <input type="checkbox" name="obstacle" value="lack-meal-inspiration" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <span class="gender-label" style="font-size: 1.05rem; text-align: left; width: 100%;">Lipsă de inspirație culinară</span>
+                        </div>
+                    </label>
+                    <label class="gender-option">
+                        <input type="checkbox" name="obstacle" value="lack-support" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <span class="gender-label" style="font-size: 1.05rem; text-align: left; width: 100%;">Lipsă de sprijin</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 1rem; width: 100%; max-width: 420px;">
+                    <button class="cta-button" type="button" onclick="prevStep(10)" style="flex: 0.4; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Înapoi
+                    </button>
+                    <button class="cta-button primary-btn" type="button" onclick="nextStep(10)" style="flex: 0.6; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Continuă
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 11: App Mechanics -->
+            <div id="step-11" style="width: 100%; display: none; flex-direction: column; align-items: center; animation: fadeIn 0.4s ease-out;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Caloriile arse</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Să adăugăm caloriile arse înapoi la obiectivul zilnic?</p>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 420px; margin-bottom: 3rem;">
+                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; margin: 0;">
+                            <i class="fa-solid fa-circle-info" style="color: var(--primary-color); margin-right: 5px;"></i>
+                            Dacă alergi și arzi 300 de calorii, dorești să mănânci 300 de calorii în plus în acea zi pentru a compensa efortul depus?
+                        </p>
+                    </div>
+
+                    <label class="gender-option">
+                        <input type="radio" name="add-back-cals" value="yes" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <div class="gender-icon" style="color: #4caf50; background: rgba(76, 175, 80, 0.15); font-size: 1.2rem; width: 40px; height: 40px;"><i class="fa-solid fa-check"></i></div>
+                            <span class="gender-label" style="font-size: 1.05rem; text-align: left; flex: 1; margin-left: 1rem;">Da</span>
+                        </div>
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio" name="add-back-cals" value="no" class="gender-radio">
+                        <div class="gender-card" style="padding: 1rem;">
+                            <div class="gender-icon" style="color: #ff6b6b; background: rgba(255, 107, 107, 0.15); font-size: 1.2rem; width: 40px; height: 40px;"><i class="fa-solid fa-xmark"></i></div>
+                            <span class="gender-label" style="font-size: 1.05rem; text-align: left; flex: 1; margin-left: 1rem;">Nu</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 1rem; width: 100%; max-width: 420px;">
+                    <button class="cta-button" type="button" onclick="prevStep(11)" style="flex: 0.4; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Înapoi
+                    </button>
+                    <button class="cta-button primary-btn" type="button" onclick="startProcessing()" style="flex: 0.6; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Finalizare
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 12: Processing Animation -->
+            <div id="step-12" style="width: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.4s ease-out; height: 100%;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Personalizare cont</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Aplicăm toată magia noastră pentru tine...</p>
+                </div>
+                
+                <div style="width: 100%; max-width: 420px; display: flex; flex-direction: column; align-items: center; gap: 1.5rem;">
+                    <!-- Circular Loader -->
+                    <div style="position: relative; width: 120px; height: 120px;">
+                        <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; transform: rotate(-90deg);">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"></circle>
+                            <circle id="progress-circle" cx="50" cy="50" r="45" fill="none" stroke="var(--primary-color)" stroke-width="8" stroke-dasharray="283" stroke-dashoffset="283" style="transition: stroke-dashoffset 0.1s linear; stroke-linecap: round;"></circle>
+                        </svg>
+                        <div id="progress-percentage" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 600; color: var(--text-primary);">0%</div>
+                    </div>
+                    
+                    <div style="text-align: center; min-height: 50px;">
+                        <p id="processing-status" style="color: var(--text-secondary); font-size: 1.05rem; margin: 0; animation: pulse 2s infinite;">Pregătim totul pentru tine...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 13: The Motivation Chart -->
+            <div id="step-13" style="width: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.4s ease-out; height: 100%;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Evoluția Ta</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Așa va arăta progresul tău în următoarele zile</p>
+                </div>
+                
+                <div style="width: 100%; max-width: 420px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                    <div style="width: 100%; height: 200px; position: relative; border-bottom: 2px solid rgba(255,255,255,0.1); border-left: 2px solid rgba(255,255,255,0.1); display: flex; align-items: flex-end; justify-content: space-between; padding-bottom: 10px; padding-top: 20px;">
+                        
+                        <!-- Simple visual graph representation using CSS -->
+                        <div id="dot-1" style="position: absolute; bottom: 80%; left: 0%; width: 10px; height: 10px; background: var(--primary-color); border-radius: 50%; z-index: 2;"></div>
+                        <div id="dot-2" style="position: absolute; bottom: 50%; left: 33%; width: 10px; height: 10px; background: var(--primary-color); border-radius: 50%; z-index: 2;"></div>
+                        <div id="dot-3" style="position: absolute; bottom: 30%; left: 66%; width: 10px; height: 10px; background: var(--primary-color); border-radius: 50%; z-index: 2;"></div>
+                        <div id="dot-4" style="position: absolute; bottom: 10%; left: 100%; width: 10px; height: 10px; background: var(--primary-color); border-radius: 50%; z-index: 2;"></div>
+                        
+                        <!-- Connecting Line (Approximation via SVG) -->
+                        <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; z-index: 1;" preserveAspectRatio="none">
+                            <line id="line-1" x1="0%" y1="20%" x2="33%" y2="50%" stroke="var(--primary-color)" stroke-width="2" />
+                            <line id="line-2" x1="33%" y1="50%" x2="66%" y2="70%" stroke="var(--primary-color)" stroke-width="2" />
+                            <line id="line-3" x1="66%" y1="70%" x2="100%" y2="90%" stroke="var(--primary-color)" stroke-width="2" />
+                        </svg>
+
+                        <!-- Labels -->
+                        <div style="position: absolute; bottom: -25px; left: -5%; color: var(--text-secondary); font-size: 0.8rem;">Azi</div>
+                        <div style="position: absolute; bottom: -25px; left: 28%; color: var(--text-secondary); font-size: 0.8rem;">7 Zile</div>
+                        <div style="position: absolute; bottom: -25px; left: 60%; color: var(--text-secondary); font-size: 0.8rem;">30 Zile</div>
+                        <div style="position: absolute; bottom: -25px; right: -5%; color: var(--text-secondary); font-size: 0.8rem;">Obiectiv</div>
+
+                        <div id="chart-start-weight" style="position: absolute; top: -15px; left: -20px; color: var(--text-primary); font-size: 0.85rem; font-weight: 600;">-- kg</div>
+                        <div id="chart-end-weight" style="position: absolute; bottom: 0%; right: -40px; color: var(--text-primary); font-size: 0.85rem; font-weight: 600;">-- kg</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; width: 100%; max-width: 420px; justify-content: center;">
+                    <button class="cta-button primary-btn" type="button" onclick="nextStep(13)" style="width: 100%; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Vezi planul tău
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 14: Final Custom Plan -->
+            <div id="step-14" style="width: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.4s ease-out; height: 100%;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Felicitări, planul e gata!</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Iată recomandarea noastră special creată pentru tine</p>
+                </div>
+                
+                <div style="width: 100%; max-width: 420px; background: rgba(77, 166, 255, 0.05); border: 1px solid rgba(77, 166, 255, 0.1); border-radius: 12px; padding: 2rem; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
+                    
+                    <div style="width: 140px; height: 140px; border-radius: 50%; border: 4px solid var(--primary-color); display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.2); box-shadow: 0 0 20px rgba(77, 166, 255, 0.2);">
+                        <span id="final-calories" style="font-size: 2rem; font-weight: 700; color: var(--text-primary);">2,450</span>
+                        <span style="font-size: 0.9rem; color: var(--text-secondary);">kcal / zi</span>
+                    </div>
+
+                    <div style="width: 100%; display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                        <!-- Protein -->
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px;">
+                                <span style="color: var(--text-primary);">Proteine</span>
+                                <span id="final-protein" style="color: var(--primary-color); font-weight: 600;">160g</span>
+                            </div>
+                            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                <div id="bar-protein" style="width: 35%; height: 100%; background: var(--primary-color);"></div>
+                            </div>
+                        </div>
+                        <!-- Carbs -->
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px;">
+                                <span style="color: var(--text-primary);">Carbohidrați</span>
+                                <span id="final-carbs" style="color: #FFD700; font-weight: 600;">250g</span>
+                            </div>
+                            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                <div id="bar-carbs" style="width: 45%; height: 100%; background: #FFD700;"></div>
+                            </div>
+                        </div>
+                        <!-- Fats -->
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px;">
+                                <span style="color: var(--text-primary);">Grăsimi</span>
+                                <span id="final-fats" style="color: #ff6b6b; font-weight: 600;">70g</span>
+                            </div>
+                            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                <div id="bar-fats" style="width: 20%; height: 100%; background: #ff6b6b;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; width: 100%; max-width: 420px; justify-content: center;">
+                    <button class="cta-button primary-btn" type="button" onclick="nextStep(14)" style="width: 100%; border-radius: 12px; font-size: 1.1rem; padding: 1rem; font-family: var(--font-body); display: flex; justify-content: center; align-items: center;">
+                        Continuă
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 15: Paywall / Upsell -->
+            <div id="step-15" style="width: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.4s ease-out; height: 100%;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #000; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-crown"></i> HELIOS PRIME PRO
+                    </div>
+                    <h2 style="color: var(--text-primary); font-family: var(--font-body); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">Atinge-ți potențialul maxim</h2>
+                    <p style="color: #a3a8c3; font-size: 0.95rem;">Deblochează toate uneltele pentru rezultate garantate</p>
+                </div>
+                
+                <div style="width: 100%; max-width: 420px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 16px; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+                    
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem;">
+                        <li style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 215, 0, 0.15); display: flex; justify-content: center; align-items: center; color: #FFD700;">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+                            <span style="color: var(--text-primary); font-size: 1rem;">Scanare alimente cu AI</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 215, 0, 0.15); display: flex; justify-content: center; align-items: center; color: #FFD700;">
+                                <i class="fa-solid fa-chart-pie"></i>
+                            </div>
+                            <span style="color: var(--text-primary); font-size: 1rem;">Rapoarte detaliate macro</span>
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 215, 0, 0.15); display: flex; justify-content: center; align-items: center; color: #FFD700;">
+                                <i class="fa-solid fa-ban"></i>
+                            </div>
+                            <span style="color: var(--text-primary); font-size: 1rem;">Fără reclame enervante</span>
+                        </li>
+                    </ul>
+
+                    <div style="margin-top: 1rem;">
+                        <button class="cta-button" type="button" onclick="window.location.href='index.html'" style="width: 100%; border-radius: 12px; font-size: 1.1rem; padding: 1.2rem; font-weight: 600; font-family: var(--font-body); display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; border: none; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);">
+                            Începe proba gratuită de 3 zile
+                        </button>
+                        <p style="text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.8rem;">Facturat anual la -80%. Anulează oricând.</p>
+                    </div>
+
+                </div>
+
+                <button type="button" onclick="window.location.href='index.html'" style="background: none; border: none; color: var(--text-secondary); font-size: 0.95rem; text-decoration: underline; cursor: pointer; transition: color 0.3s ease;">
+                    Continuă cu planul gratuit
+                </button>
+            </div>
+
+            <script>
+                function nextStep(step) {
+                    document.getElementById('step-' + step).style.display = 'none';
+                    document.getElementById('step-' + (step + 1)).style.display = 'flex';
+                    if (step + 1 === 6) {
+                        updatePace();
+                    }
+                }
+                function prevStep(step) {
+                    document.getElementById('step-' + step).style.display = 'none';
+                    document.getElementById('step-' + (step - 1)).style.display = 'flex';
+                }
+                
+                function startProcessing() {
+                    document.getElementById('step-11').style.display = 'none';
+                    document.getElementById('step-12').style.display = 'flex';
+                    
+                    const progressCircle = document.getElementById('progress-circle');
+                    const progressPercentage = document.getElementById('progress-percentage');
+                    const statusText = document.getElementById('processing-status');
+                    
+                    const totalLength = 283; // 2 * pi * 45
+                    let progress = 0;
+                    
+                    let lang = localStorage.getItem('heliosLang') || 'ro';
+                    const statuses = lang === 'en' ? [
+                        { p: 10, text: "Analyzing basic data..." },
+                        { p: 30, text: "Calculating BMI and BMR..." },
+                        { p: 55, text: "Evaluating Total Daily Energy Expenditure (TDEE)..." },
+                        { p: 82, text: "Applying caloric deficit/surplus..." },
+                        { p: 95, text: "Generating nutritional recommendations..." },
+                        { p: 100, text: "Complete!" }
+                    ] : [
+                        { p: 10, text: "Analizăm datele de bază..." },
+                        { p: 30, text: "Calculăm BMI și BMR..." },
+                        { p: 55, text: "Evaluăm Total Daily Energy Expenditure (TDEE)..." },
+                        { p: 82, text: "Aplicăm deficitul/excedentul caloric..." },
+                        { p: 95, text: "Generăm recomandările nutriționale..." },
+                        { p: 100, text: "Finalizat!" }
+                    ];
+                    
+                    let statusIndex = 0;
+                    
+                    const interval = setInterval(() => {
+                        progress += Math.random() * 2;
+                        if (progress >= 100) progress = 100;
+                        
+                        // Update visual circle
+                        const offset = totalLength - (progress / 100) * totalLength;
+                        progressCircle.style.strokeDashoffset = offset;
+                        
+                        // Update percentage text
+                        progressPercentage.innerText = Math.floor(progress) + '%';
+                        
+                        // Update status text
+                        if (statusIndex < statuses.length && progress >= statuses[statusIndex].p) {
+                            statusText.innerText = statuses[statusIndex].text;
+                            statusIndex++;
+                        }
+                        
+                        if (progress >= 100) {
+                            clearInterval(interval);
+                            setTimeout(() => {
+                                nextStep(12);
+                                setupChartData();
+                            }, 800);
+                        }
+                    }, 50); // Speed of animation
+                }
+
+                function setupChartData() {
+                    const currentInput = document.getElementById('current-weight').value || 75;
+                    const targetInput = document.getElementById('target-weight-input').value || 70;
+                    
+                    let cW = parseFloat(currentInput);
+                    let tW = parseFloat(targetInput);
+                    
+                    document.getElementById('chart-start-weight').innerText = `${cW} kg`;
+                    document.getElementById('chart-end-weight').innerText = `${tW} kg`;
+                    
+                    // Simple chart adjustment logic based on whether gaining or losing
+                    let minW = Math.min(cW, tW) - 2;
+                    let maxW = Math.max(cW, tW) + 2;
+                    let range = maxW - minW;
+                    
+                    // Positions mapping 0 to 100% bottom
+                    let getPos = (w) => ((w - minW) / range) * 100;
+                    
+                    let startPos = getPos(cW);
+                    let endPos = getPos(tW);
+                    
+                    // Just basic interpolation
+                    let p2 = startPos - ((startPos - endPos) * 0.33);
+                    let p3 = startPos - ((startPos - endPos) * 0.66);
+                    
+                    document.getElementById('dot-1').style.bottom = `${startPos}%`;
+                    document.getElementById('dot-2').style.bottom = `${p2}%`;
+                    document.getElementById('dot-3').style.bottom = `${p3}%`;
+                    document.getElementById('dot-4').style.bottom = `${endPos}%`;
+                    
+                    // Invert SVG Y-axes because 0% is TOP and 100% is BOTTOM visually in an SVG default scale using % lines
+                    // actually wait, let's use straightforward CSS % offsets from TOP for SVG
+                    // SVG Y=0% is top, bottom is 100%. So we subtract from 100.
+                    let invPos = (p) => 100 - p;
+                    
+                    document.getElementById('line-1').setAttribute('y1', `${invPos(startPos)}%`);
+                    document.getElementById('line-1').setAttribute('y2', `${invPos(p2)}%`);
+                    
+                    document.getElementById('line-2').setAttribute('y1', `${invPos(p2)}%`);
+                    document.getElementById('line-2').setAttribute('y2', `${invPos(p3)}%`);
+                    
+                    document.getElementById('line-3').setAttribute('y1', `${invPos(p3)}%`);
+                    document.getElementById('line-3').setAttribute('y2', `${invPos(endPos)}%`);
+                    
+                    // Generate pseudo-random calories around 2000-3000 based on weight
+                    let isBulking = tW > cW;
+                    let baseCals = cW * 24 * (isBulking ? 1.2 : 1.0) + (isBulking ? 300 : -300);
+                    baseCals = Math.round(Math.max(1200, Math.min(4000, baseCals)));
+                    
+                    document.getElementById('final-calories').innerText = baseCals.toLocaleString();
+                    
+                    let pCalc = Math.round(cW * 2); // 2g per bodyweight for example
+                    let fCalc = Math.round(cW * 0.8);
+                    let cCalc = Math.round((baseCals - ((pCalc * 4) + (fCalc * 9))) / 4);
+                    
+                    document.getElementById('final-protein').innerText = `${pCalc}g`;
+                    document.getElementById('final-fats').innerText = `${fCalc}g`;
+                    document.getElementById('final-carbs').innerText = `${cCalc > 0 ? cCalc : 100}g`;
+                    
+                    let tM = pCalc + fCalc + cCalc;
+                    document.getElementById('bar-protein').style.width = `${(pCalc/tM)*100}%`;
+                    document.getElementById('bar-fats').style.width = `${(fCalc/tM)*100}%`;
+                    document.getElementById('bar-carbs').style.width = `${(cCalc/tM)*100}%`;
+                }
+
+                function showValidationPrompt() {
+                    const targetInput = document.getElementById('target-weight-input').value;
+                    const currentInput = document.getElementById('current-weight').value;
+                    const prompt = document.getElementById('weight-validation-prompt');
+                    const messageSpan = document.getElementById('validation-message');
+                    
+                    let lang = localStorage.getItem('heliosLang') || 'ro';
+                    if (targetInput && targetInput > 0) {
+                        let target = parseFloat(targetInput);
+                        let current = parseFloat(currentInput);
+                        
+                        if (!isNaN(current) && current > 0) {
+                            let diff = current - target;
+                            if (diff > 0) {
+                                messageSpan.innerText = lang === 'en' ? `Losing ${diff.toFixed(1)} kg is realistic. You got this! 🚀` : `Să slăbești ${diff.toFixed(1)} kg este un obiectiv realist. Poți să o faci! 🚀`;
+                            } else if (diff < 0) {
+                                messageSpan.innerText = lang === 'en' ? `Gaining ${Math.abs(diff).toFixed(1)} kg is a great goal. Good luck! 💪` : `Să pui ${Math.abs(diff).toFixed(1)} kg este un obiectiv grozav. Mult succes! 💪`;
+                            } else {
+                                messageSpan.innerText = lang === 'en' ? `Maintaining weight requires perseverance. We will help you! ⭐` : `Menținerea greutății necesită perseverență. Te vom ajuta noi! ⭐`;
+                            }
+                        } else {
+                            messageSpan.innerText = lang === 'en' ? `Aiming for ${target} kg is a good start. You can do it! ✨` : `Țintind spre ${target} kg este un start bun. Tu poți! ✨`;
+                        }
+                        
+                        prompt.style.display = "block";
+                        prompt.style.opacity = 1;
+                    } else {
+                        prompt.style.display = "none";
+                    }
+                    if (document.getElementById('step-6').style.display !== 'none') {
+                        updatePace();
+                    }
+                }
+
+                function updatePace() {
+                    let lang = localStorage.getItem('heliosLang') || 'ro';
+                    const slider = document.getElementById('pace-slider').value;
+                    const messageSpan = document.getElementById('pace-message');
+                    const targetInput = document.getElementById('target-weight-input').value;
+                    const currentInput = document.getElementById('current-weight').value;
+                    
+                    let diff = 0;
+                    if (targetInput && currentInput) {
+                        let target = parseFloat(targetInput);
+                        let current = parseFloat(currentInput);
+                        if (!isNaN(current) && !isNaN(target)) {
+                            diff = Math.abs(current - target);
+                        }
+                    }
+
+                    if (diff === 0 || isNaN(diff)) {
+                        messageSpan.innerText = lang === 'en' ? "Modify current and target weight for an estimate!" : "Modifică greutatea curentă și pe cea țintă pentru o estimare!";
+                        return;
+                    }
+
+                    let kgPerWeek = 0.5;
+                    if (slider == 1) kgPerWeek = 0.25; // Lent
+                    else if (slider == 2) kgPerWeek = 0.5; // Recomandat
+                    else if (slider == 3) kgPerWeek = 1.0; // Rapid
+
+                    let weeks = diff / kgPerWeek;
+                    let days = Math.round(weeks * 7);
+
+                    if (days > 0) {
+                        messageSpan.innerText = lang === 'en' ? `You will reach your goal in approximately ${days} days` : `Vei atinge obiectivul în aproximativ ${days} zile`;
+                    } else {
+                        messageSpan.innerText = lang === 'en' ? "You are very close to your goal!" : "Ești foarte aproape de obiectiv!";
+                    }
+                }
+            </script>
+            <script>
+                // Auto translate everything in register.html matching dictionary
+                document.addEventListener("DOMContentLoaded", () => {
+                    const appLang = localStorage.getItem('heliosLang') || 'ro';
+                    if (appLang === 'en') {
+                        const enDict = {
+                            "Sexul": "Gender",
+                            "Folosit pentru a calcula corect rata metabolică": "Used to correctly calculate metabolic rate",
+                            "Bărbat": "Male",
+                            "Femeie": "Female",
+                            "Continuă": "Continue",
+                            "Data nașterii": "Date of Birth",
+                            "Ne ajută să personalizăm recomandările pentru tine": "Helps us personalize recommendations for you",
+                            "Înapoi": "Back",
+                            "Măsurători actuale": "Current Measurements",
+                            "Care sunt măsurătorile tale curente?": "What are your current measurements?",
+                            "Înălțime (cm)": "Height (cm)",
+                            "Greutate (kg)": "Weight (kg)",
+                            "Procentaj grăsime corporală (Opțional %)": "Body Fat Percentage (Optional %)",
+                            "Obiectiv principal": "Primary Goal",
+                            "Care este obiectivul tău de greutate?": "What is your weight goal?",
+                            "Slăbire": "Lose weight",
+                            "Menținere": "Maintain weight",
+                            "Creștere în masă": "Gain weight",
+                            "Greutate țintă": "Target Weight",
+                            "Care este greutatea ta țintă?": "What is your target weight?",
+                            "Greutate țintă (kg)": "Target weight (kg)",
+                            "Ritmul dorit": "Desired Pace",
+                            "Cât de repede vrei să îți atingi obiectivul?": "How fast do you want to reach your goal?",
+                            "Lent": "Slow",
+                            "Recomandat": "Recommended",
+                            "Rapid": "Fast",
+                            "Nivel de activitate": "Activity Level",
+                            "Care este nivelul tău zilnic de activitate?": "What is your baseline daily activity level?",
+                            "Sedentar": "Sedentary",
+                            "Sub 5.000 de pași": "Less than 5000 steps",
+                            "Ușor activ": "Lightly Active",
+                            "5.000 - 10.000 de pași": "5000 - 10000 steps",
+                            "Activ": "Active",
+                            "10.000+ pași": "10000+ steps",
+                            "Foarte activ": "Very Active",
+                            "Job fizic / Efort intens": "Highly physical job",
+                            "Antrenamente": "Workouts",
+                            "Câte antrenamente faci pe săptămână?": "How many workouts do you do per week?",
+                            "Din când în când": "Now and then",
+                            "Câteva pe săptămână": "A few per week",
+                            "Atlet dedicat": "Dedicated athlete",
+                            "Dietă vizată": "Dietary Preferences",
+                            "Urmezi o dietă specifică?": "Do you follow a specific diet?",
+                            "Clasică": "Classic",
+                            "Pescatariană": "Pescatarian",
+                            "Vegetariană": "Vegetarian",
+                            "Vegană": "Vegan",
+                            "Keto": "Keto",
+                            "Proteine": "High-Protein",
+                            "Obstacole": "Behavioral Obstacles",
+                            "Ce te oprește cel mai des să îți atingi obiectivele?": "What’s stopping you from reaching your goals?",
+                            "Lipsa consecvenței": "Lack of consistency",
+                            "Obiceiuri alimentare nesănătoase": "Unhealthy eating habits",
+                            "Program aglomerat": "Busy schedule",
+                            "Lipsă de inspirație culinară": "Lack of meal inspiration",
+                            "Lipsă de sprijin": "Lack of support",
+                            "Caloriile arse": "App Mechanics",
+                            "Să adăugăm caloriile arse înapoi la obiectivul zilnic?": "Should we add calories burned back to your daily goal?",
+                            "Dacă alergi și arzi 300 de calorii, dorești să mănânci 300 de calorii în plus în acea zi pentru a compensa efortul depus?": "If you run and burn 300 calories, do you want to eat 300 extra calories that day to compensate for the effort?",
+                            "Da": "Yes",
+                            "Nu": "No",
+                            "Finalizare": "Finish",
+                            "Personalizare cont": "Customizing Account",
+                            "Aplicăm toată magia noastră pentru tine...": "Applying all our magic for you...",
+                            "Pregătim totul pentru tine...": "Preparing everything for you...",
+                            "Evoluția Ta": "Your Evolution",
+                            "Așa va arăta progresul tău în următoarele zile": "This is what your progress will look like over the next days",
+                            "Azi": "Today",
+                            "7 Zile": "7 Days",
+                            "30 Zile": "30 Days",
+                            "Obiectiv": "Goal",
+                            "Vezi planul tău": "See your plan",
+                            "Felicitări, planul e gata!": "Congratulations, your custom plan is ready!",
+                            "Iată recomandarea noastră special creată pentru tine": "Here is our recommendation specially created for you",
+                            "kcal / zi": "kcal / day",
+                            "Carbohidrați": "Carbs",
+                            "Grăsimi": "Fats",
+                            "Atinge-ți potențialul maxim": "Reach your maximum potential",
+                            "Deblochează toate uneltele pentru rezultate garantate": "Unlock all tools for guaranteed results",
+                            "Scanare alimente cu AI": "AI Food Scanning",
+                            "Rapoarte detaliate macro": "Detailed macro reports",
+                            "Fără reclame enervante": "No annoying ads",
+                            "Începe proba gratuită de 3 zile": "Start 3-Day Free Trial",
+                            "Facturat anual la -80%. Anulează oricând.": "Billed annually at -80%. Cancel anytime.",
+                            "Continuă cu planul gratuit": "Continue with free plan",
+                        };
+                        
+                        document.title = "Helios Prime - Create Profile";
+
+                        function translateNodeTree(node) {
+                            if (node.nodeType === Node.TEXT_NODE) {
+                                let tText = node.textContent.trim();
+                                if (enDict[tText]) {
+                                    node.textContent = node.textContent.replace(tText, enDict[tText]);
+                                }
+                            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                                if (node.tagName === 'INPUT' && node.placeholder) {
+                                    if (node.placeholder === 'ZZ') node.placeholder = 'DD';
+                                    else if (node.placeholder === 'LL') node.placeholder = 'MM';
+                                    else if (node.placeholder === 'AAAA') node.placeholder = 'YYYY';
+                                }
+                                if (node.tagName !== 'SCRIPT') {
+                                    for (let child of [...node.childNodes]) {
+                                        translateNodeTree(child);
+                                    }
+                                }
+                            }
+                        }
+                        translateNodeTree(document.querySelector('main'));
+                    }
+                });
+            </script>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

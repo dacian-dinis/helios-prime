@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helios Prime - Rețete</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .recipes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 1000px) {
+            .recipes-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .recipes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .recipe-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            color: var(--text-primary);
+            position: relative;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--text-accent);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 181, 129, 0.15);
+        }
+
+        .recipe-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--text-accent);
+        }
+
+        .recipe-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .recipe-tags {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            background: rgba(255, 215, 0, 0.15);
+            color: #FFD700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .recipe-title {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        .recipe-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            margin-top: auto;
+        }
+
+        .recipe-meta i {
+            color: var(--text-accent);
+            margin-right: 5px;
+        }
+
+        .view-recipe-btn {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--text-accent);
+            color: var(--text-accent);
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .recipe-card:hover .view-recipe-btn {
+            background: var(--text-accent);
+            color: #000;
+        }
+
+        /* Recipe Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--text-accent);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 181, 129, 0.1);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #ff6b6b;
+        }
+
+        .modal-header-img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-bottom: 2px solid var(--text-accent);
+        }
+
+        .modal-body {
+            padding: 2.5rem;
+        }
+
+        .modal-title {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            color: #FFD700;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .stat-val {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ingredients-list {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .ingredients-list li {
+            padding: 10px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+        }
+
+        .ingredients-list li i {
+            color: var(--text-accent);
+            margin-right: 15px;
+        }
+
+        .instructions-list {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+
+        .instructions-list li {
+            position: relative;
+            padding: 0 0 20px 45px;
+            line-height: 1.6;
+        }
+
+        .instructions-list li::before {
+            counter-increment: step-counter;
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background: rgba(212, 181, 129, 0.15);
+            color: var(--text-accent);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* Light theme overrides built into style.css will handle overall bg, this handles modal specific */
+        body.light-theme .modal-close {
+            background: rgba(255, 255, 255, 0.8);
+            color: #000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        body.light-theme .modal-title {
+            color: var(--text-primary);
+        }
+        body.light-theme .modal-overlay {
+            background: rgba(255,255,255,0.7);
+        }
+
+    </style>
+</head>
+
+<body>
+    <canvas id="particle-canvas"></canvas>
+
+    <nav class="side-panel">
+        <div class="panel-top">
+            <a href="index.html" class="panel-link"><i class="fa-solid fa-house"></i> <span data-translate="P_HOME">Acasă</span></a>
+            <a href="register.html" class="panel-link"><i class="fa-solid fa-user-plus"></i> <span data-translate="P_PROFILE">Crează-ți profilul</span></a>
+            <a href="#" class="panel-link"><i class="fa-solid fa-user"></i> <span data-translate="P_ACCOUNT">Cont</span></a>
+            <a href="recipes.html" class="panel-link active" style="background-color: var(--tab-bg); color: var(--text-primary);"><i class="fa-solid fa-utensils" style="color: var(--text-accent);"></i> <span data-translate="P_RECIPES">Rețete</span></a>
+        </div>
+        <div class="panel-bottom">
+            <div id="settingsPanel" class="settings-sub-panel" style="display: none; flex-direction: column; gap: 0.5rem; margin-bottom: 0.5rem; padding-left: 0.5rem;">
+                <div class="lang-switch mobile-lang-switch" style="display: none; border: none; padding: 0.4rem 0.8rem;">
+                    <button id="langRoMobile" class="lang-btn active">RO</button>
+                    <span class="lang-divider">|</span>
+                    <button id="langEnMobile" class="lang-btn">EN</button>
+                </div>
+                <a href="#" class="panel-link" id="themeToggleBtn"><i class="fa-solid fa-circle-half-stroke"></i> <span data-translate="P_THEME">Site Theme</span></a>
+                <a href="#" class="panel-link"><i class="fa-solid fa-crown"></i> <span data-translate="P_SUBSCRIPTION">Subscription</span></a>
+                <a href="#" class="panel-link"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span data-translate="P_LOGOUT">Log out</span></a>
+            </div>
+            <a href="#" class="panel-link" id="settingsBtn"><i class="fa-solid fa-gear"></i> <span data-translate="P_SETTINGS">Settings</span></a>
+        </div>
+    </nav>
+
+    <div class="wrapper">
+        <header style="justify-content: space-between;">
+            <div class="logo-container">
+                <img src="logo.jpg.png" alt="Helios Prime Logo" class="logo-icon">
+                <div class="logo-text">Helios Prime</div>
+            </div>
+            <div class="header-actions">
+                <div class="lang-switch desktop-lang-switch">
+                    <button id="langRo" class="lang-btn active">RO</button>
+                    <span class="lang-divider">|</span>
+                    <button id="langEn" class="lang-btn">EN</button>
+                </div>
+                <a href="register.html" class="login-btn" data-translate="LOGIN">Log in</a>
+                <a href="#" id="mobileMenuBtn" class="mobile-settings-btn" style="display: none; color: var(--text-primary); font-size: 1.5rem; margin-left: 10px;"><i class="fa-solid fa-bars"></i></a>
+            </div>
+        </header>
+
+        <main style="flex-direction: column; align-items: center; padding-top: 2rem;">
+            <div style="text-align: center; width: 100%; max-width: 800px; margin-bottom: 2rem;">
+                <h1 style="font-size: 3.5rem; margin-bottom: 1rem;" data-translate="RECIPES_TITLE">Rețete Sănătoase</h1>
+                <p class="subtitle" data-translate="RECIPES_SUBTITLE">Descoperă preparate delicioase, simplu de gătit, calculate perfect pentru obiectivele tale.</p>
+            </div>
+
+            <div class="recipes-grid">
+                
+                <!-- Recipe Card 1 -->
+                <div class="recipe-card" onclick="openRecipe(1)">
+                    <img src="dish1.png" alt="Salmon Poke Bowl" class="recipe-image">
+                    <div class="recipe-content">
+                        <div class="recipe-tags">
+                            <span class="tag">High Protein</span>
+                            <span class="tag">Omega-3</span>
+                        </div>
+                        <h3 class="recipe-title" data-translate="RECIPE_1_TITLE">Poke Bowl cu Somon</h3>
+                        <div class="recipe-meta">
+                            <span><i class="fa-solid fa-fire"></i> 450 kcal</span>
+                            <span><i class="fa-solid fa-clock"></i> 15 min</span>
+                        </div>
+                        <button class="view-recipe-btn" data-translate="VIEW_RECIPE">Vezi Rețeta</button>
+                    </div>
+                </div>
+
+                <!-- Recipe Card 2 -->
+                <div class="recipe-card" onclick="openRecipe(2)">
+                    <img src="dish2.png" alt="Chicken Salad" class="recipe-image">
+                    <div class="recipe-content">
+                        <div class="recipe-tags">
+                            <span class="tag">Low Carb</span>
+                            <span class="tag">Keto</span>
+                        </div>
+                        <h3 class="recipe-title" data-translate="RECIPE_2_TITLE">Salată Proteică cu Pui</h3>
+                        <div class="recipe-meta">
+                            <span><i class="fa-solid fa-fire"></i> 320 kcal</span>
+                            <span><i class="fa-solid fa-clock"></i> 20 min</span>
+                        </div>
+                        <button class="view-recipe-btn" data-translate="VIEW_RECIPE">Vezi Rețeta</button>
+                    </div>
+                </div>
+
+                <!-- Recipe Card 3 -->
+                <div class="recipe-card" onclick="openRecipe(3)">
+                    <img src="dish3.png" alt="Healthy Pasta" class="recipe-image">
+                    <div class="recipe-content">
+                        <div class="recipe-tags">
+                            <span class="tag">Complex Carbs</span>
+                            <span class="tag">Vegetarian</span>
+                        </div>
+                        <h3 class="recipe-title" data-translate="RECIPE_3_TITLE">Paste Integrale cu Roșii și Busuioc</h3>
+                        <div class="recipe-meta">
+                            <span><i class="fa-solid fa-fire"></i> 380 kcal</span>
+                            <span><i class="fa-solid fa-clock"></i> 25 min</span>
+                        </div>
+                        <button class="view-recipe-btn" data-translate="VIEW_RECIPE">Vezi Rețeta</button>
+                    </div>
+                </div>
+
+                <!-- Recipe Card 4 -->
+                <div class="recipe-card" onclick="openRecipe(4)">
+                    <img src="dish4.png" alt="Oatmeal Bowl" class="recipe-image">
+                    <div class="recipe-content">
+                        <div class="recipe-tags">
+                            <span class="tag">High Fiber</span>
+                            <span class="tag">Breakfast</span>
+                        </div>
+                        <h3 class="recipe-title" data-translate="RECIPE_4_TITLE">Bol de Ovăz cu Fructe de Pădure</h3>
+                        <div class="recipe-meta">
+                            <span><i class="fa-solid fa-fire"></i> 310 kcal</span>
+                            <span><i class="fa-solid fa-clock"></i> 10 min</span>
+                        </div>
+                        <button class="view-recipe-btn" data-translate="VIEW_RECIPE">Vezi Rețeta</button>
+                    </div>
+                </div>
+
+                <!-- Recipe Card 5 -->
+                <div class="recipe-card" onclick="openRecipe(5)">
+                    <img src="dish5.png" alt="Green Smoothie" class="recipe-image">
+                    <div class="recipe-content">
+                        <div class="recipe-tags">
+                            <span class="tag">Detox</span>
+                            <span class="tag">Vegan</span>
+                        </div>
+                        <h3 class="recipe-title" data-translate="RECIPE_5_TITLE">Smoothie Verde Revigorant</h3>
+                        <div class="recipe-meta">
+                            <span><i class="fa-solid fa-fire"></i> 180 kcal</span>
+                            <span><i class="fa-solid fa-clock"></i> 5 min</span>
+                        </div>
+                        <button class="view-recipe-btn" data-translate="VIEW_RECIPE">Vezi Rețeta</button>
+                    </div>
+                </div>
+
+                <!-- Recipe Card 6 -->
+                <div class="recipe-card" onclick="openRecipe(6)">
+                    <img src="dish6.png" alt="Steak Dinner" class="recipe-image">
+                    <div class="recipe-content">
+                        <div class="recipe-tags">
+                            <span class="tag">High Protein</span>
+                            <span class="tag">Iron Rich</span>
+                        </div>
+                        <h3 class="recipe-title" data-translate="RECIPE_6_TITLE">Friptură de Vită cu Cartofi Dulci</h3>
+                        <div class="recipe-meta">
+                            <span><i class="fa-solid fa-fire"></i> 520 kcal</span>
+                            <span><i class="fa-solid fa-clock"></i> 30 min</span>
+                        </div>
+                        <button class="view-recipe-btn" data-translate="VIEW_RECIPE">Vezi Rețeta</button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Recipe Modal Template -->
+    <div id="recipeModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeRecipe()"><i class="fa-solid fa-xmark"></i></button>
+            <img id="modalImg" src="" alt="Recipe Image" class="modal-header-img">
+            
+            <div class="modal-body">
+                <h2 id="modalTitle" class="modal-title">Nume Rețetă</h2>
+                
+                <div class="modal-stats">
+                    <div class="stat-item">
+                        <span class="stat-val" id="modalCals">--</span>
+                        <span class="stat-label" data-translate="CALS_LABEL">Calorii</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val" id="modalTime">--</span>
+                        <span class="stat-label" data-translate="PREP_LABEL">Preparare</span>
+                    </div>
+                    <div class="stat-item" style="margin-left: auto;">
+                        <span class="stat-val" style="color: var(--text-accent);" id="modalProtein">--</span>
+                        <span class="stat-label" data-translate="PROTEIN_LABEL">Proteine</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 3rem; flex-wrap: wrap;">
+                    <!-- Ingredients -->
+                    <div style="flex: 1; min-width: 250px;">
+                        <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-primary); border-left: 4px solid var(--text-accent); padding-left: 10px;" data-translate="INGREDIENTS">Ingrediente</h3>
+                        <ul id="modalIngredients" class="ingredients-list">
+                            <!-- Injected dynamically -->
+                        </ul>
+                    </div>
+                    
+                    <!-- Instructions -->
+                    <div style="flex: 1.5; min-width: 300px;">
+                        <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-primary); border-left: 4px solid var(--text-accent); padding-left: 10px;" data-translate="INSTRUCTIONS">Instrucțiuni</h3>
+                        <ul id="modalInstructions" class="instructions-list">
+                            <!-- Injected dynamically -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Recipe Database Logic
+        const recipesDB = {
+            1: {
+                img: 'dish1.png',
+                ro: {
+                    title: 'Poke Bowl cu Somon',
+                    cals: '450 kcal',
+                    time: '15 min',
+                    protein: '35g',
+                    ingredients: [
+                        '150g File de somon proaspăt, tăiat cubulețe',
+                        '80g Orez pentru sushi sau quinoa (fiert)',
+                        '1/2 Avocado feliat',
+                        '50g Edamame',
+                        '1 lingură sos de soia light',
+                        'Semințe de susan pentru decor'
+                    ],
+                    instructions: [
+                        'Gătește orezul conform instrucțiunilor de pe ambalaj și lasă-l să se răcească ușor.',
+                        'Între timp, taie somonul în cubulețe și marinează-l cu sosul de soia timp de 5 minute.',
+                        'Spală și pregătește legumele: feliază avocado-ul subțire.',
+                        'Așează orezul la baza bolului, apoi aranjează elegant somonul, edamamele și avocado-ul deasupra.',
+                        'Presară semințele de susan și servește imediat.'
+                    ]
+                },
+                en: {
+                    title: 'Salmon Poke Bowl',
+                    cals: '450 kcal',
+                    time: '15 min',
+                    protein: '35g',
+                    ingredients: [
+                        '150g Fresh salmon fillet, diced',
+                        '80g Sushi rice or quinoa (cooked)',
+                        '1/2 Sliced avocado',
+                        '50g Edamame beans',
+                        '1 tbsp light soy sauce',
+                        'Sesame seeds for garnish'
+                    ],
+                    instructions: [
+                        'Cook the rice according to package instructions and let it cool slightly.',
+                        'Meanwhile, dice the salmon and marinate it in soy sauce for 5 minutes.',
+                        'Wash and prep your vegetables: slice the avocado thinly.',
+                        'Place the rice at the base of the bowl, then elegantly arrange the salmon, edamame, and avocado on top.',
+                        'Sprinkle sesame seeds and serve immediately.'
+                    ]
+                }
+            },
+            2: {
+                img: 'dish2.png',
+                ro: {
+                    title: 'Salată Proteică cu Pui',
+                    cals: '320 kcal',
+                    time: '20 min',
+                    protein: '45g',
+                    ingredients: [
+                        '200g Piept de pui la grătar',
+                        '2 mâini de baby spanac proaspăt',
+                        '100g Roșii cherry tăiate jumătăți',
+                        '1/4 Ceapă roșie tăiată mărunt',
+                        '1 lingură Ulei de măsline extravirgin',
+                        'Oțet balsamic, sare și piper după gust'
+                    ],
+                    instructions: [
+                        'Asezonează pieptul de pui cu sare și piper, apoi gătește-l pe o tigaie grill timp de 6-7 minute pe fiecare parte până este complet făcut.',
+                        'Lasă puiul să se odihnească câteva minute, apoi taie-l felii.',
+                        'Într-un bol mare, adaugă spanacul, roșiile cherry și ceapa roșie.',
+                        'Prepară dressing-ul amestecând uleiul de măsline cu oțetul balsamic.',
+                        'Adaugă feliile de pui deasupra salatei, toarnă dressing-ul și amestecă ușor.'
+                    ]
+                },
+                en: {
+                    title: 'High-Protein Chicken Salad',
+                    cals: '320 kcal',
+                    time: '20 min',
+                    protein: '45g',
+                    ingredients: [
+                        '200g Grilled chicken breast',
+                        '2 handfuls fresh baby spinach',
+                        '100g Cherry tomatoes, halved',
+                        '1/4 Red onion, finely chopped',
+                        '1 tbsp Extra virgin olive oil',
+                        'Balsamic vinegar, salt & pepper to taste'
+                    ],
+                    instructions: [
+                        'Season the chicken breast with salt and pepper, then grill for 6-7 minutes on each side until fully cooked.',
+                        'Let the chicken rest for a few minutes before slicing.',
+                        'In a large bowl, toss together the spinach, cherry tomatoes, and red onion.',
+                        'Prepare the dressing by whisking olive oil and balsamic vinegar.',
+                        'Top the salad with sliced chicken, drizzle with dressing, and toss gently.'
+                    ]
+                }
+            },
+            3: {
+                img: 'dish3.png',
+                ro: {
+                    title: 'Paste Integrale cu Roșii și Busuioc',
+                    cals: '380 kcal',
+                    time: '25 min',
+                    protein: '14g',
+                    ingredients: [
+                        '80g Paste integrale (penne sau spaghete)',
+                        '150g Sos de roșii pasate',
+                        '1 Cățel de usturoi tăiat mărunt',
+                        '1 lingură Ulei de măsline extravirgin',
+                        'Câteva frunze de busuioc proaspăt',
+                        '10g Parmezan ras (opțional)'
+                    ],
+                    instructions: [
+                        'Fierbe pastele în apă cu sare conform instrucțiunilor de pe ambalaj (al dente).',
+                        'Între timp, încălzește uleiul de măsline într-o tigaie și călește usturoiul timp de 30 secunde.',
+                        'Adaugă sosul de roșii, sare și piper, și lasă să fiarbă la foc mic 10 minute.',
+                        'Scurge pastele și amestecă-le în tigaie cu sosul cald.',
+                        'Servește cu frunze de busuioc proaspăt și parmezan ras deasupra.'
+                    ]
+                },
+                en: {
+                    title: 'Whole Wheat Tomato Basil Pasta',
+                    cals: '380 kcal',
+                    time: '25 min',
+                    protein: '14g',
+                    ingredients: [
+                        '80g Whole wheat pasta',
+                        '150g Crushed tomato sauce',
+                        '1 Clove garlic, minced',
+                        '1 tbsp Extra virgin olive oil',
+                        'Fresh basil leaves',
+                        '10g Grated parmesan (optional)'
+                    ],
+                    instructions: [
+                        'Boil the pasta in salted water according to package instructions (al dente).',
+                        'Meanwhile, heat olive oil in a pan and sauté the garlic for 30 seconds.',
+                        'Add tomato sauce, salt, and pepper, and simmer on low heat for 10 minutes.',
+                        'Drain the pasta and toss it into the warm sauce.',
+                        'Serve with fresh basil leaves and grated parmesan on top.'
+                    ]
+                }
+            },
+            4: {
+                img: 'dish4.png',
+                ro: {
+                    title: 'Bol de Ovăz cu Fructe de Pădure',
+                    cals: '310 kcal',
+                    time: '10 min',
+                    protein: '12g',
+                    ingredients: [
+                        '50g Fulgi de ovăz',
+                        '150ml Lapte de migdale (sau preferat)',
+                        '50g Mix de fructe de pădure (zmeură, afine)',
+                        '1/2 Banană feliată',
+                        '1 linguriță Semințe de chia',
+                        '10g Nuci tocate'
+                    ],
+                    instructions: [
+                        'Pune fulgii de ovăz și laptele într-o cratiță mică la foc mediu.',
+                        'Lasă să fiarbă ușor amestecând constant timp de 5-7 minute, până se îngroașă.',
+                        'Dă deoparte și lasă să se răcească puțin.',
+                        'Transferă ovăzul într-un bol.',
+                        'Decorează deasupra cu banana feliată, fructele de pădure, semințele de chia și nucile.'
+                    ]
+                },
+                en: {
+                    title: 'Berry Oatmeal Bowl',
+                    cals: '310 kcal',
+                    time: '10 min',
+                    protein: '12g',
+                    ingredients: [
+                        '50g Rolled oats',
+                        '150ml Almond milk (or preferred)',
+                        '50g Mixed berries (raspberries, blueberries)',
+                        '1/2 Sliced banana',
+                        '1 tsp Chia seeds',
+                        '10g Chopped walnuts'
+                    ],
+                    instructions: [
+                        'Place the oats and milk in a small saucepan over medium heat.',
+                        'Simmer gently while stirring constantly for 5-7 minutes, until thickened.',
+                        'Remove from heat and let it cool slightly.',
+                        'Transfer the oatmeal to a bowl.',
+                        'Top with sliced banana, berries, chia seeds, and walnuts.'
+                    ]
+                }
+            },
+            5: {
+                img: 'dish5.png',
+                ro: {
+                    title: 'Smoothie Verde Revigorant',
+                    cals: '180 kcal',
+                    time: '5 min',
+                    protein: '4g',
+                    ingredients: [
+                        '1 Mână mare de spanac proaspăt',
+                        '1 Măr verde, tăiat cubulețe (fără cotor)',
+                        '1/2 Castravete, curățat și tăiat',
+                        '1 bucățică mică de ghimbir proaspăt curățat',
+                        '200ml Apă de cocos sau apă plată',
+                        'Sucul de la 1/2 lămâie'
+                    ],
+                    instructions: [
+                        'Spală bine toate ingredientele.',
+                        'Adaugă spanacul și apa în blender și mixează până la omogenizare.',
+                        'Adaugă mărul, castravetele, ghimbirul și sucul de lămâie.',
+                        'Mixează încă 1-2 minute până când obții o consistență foarte fină.',
+                        'Toarnă într-un pahar înalt și servește imediat pentru maximum de vitamine.'
+                    ]
+                },
+                en: {
+                    title: 'Refreshing Green Smoothie',
+                    cals: '180 kcal',
+                    time: '5 min',
+                    protein: '4g',
+                    ingredients: [
+                        '1 Large handful fresh spinach',
+                        '1 Green apple, cored and diced',
+                        '1/2 Cucumber, peeled and chopped',
+                        '1 small piece fresh ginger, peeled',
+                        '200ml Coconut water or plain water',
+                        'Juice of 1/2 lemon'
+                    ],
+                    instructions: [
+                        'Wash all ingredients thoroughly.',
+                        'Add spinach and liquid to the blender and blend until smooth.',
+                        'Add the apple, cucumber, ginger, and lemon juice.',
+                        'Blend for another 1-2 minutes until you reach a very smooth consistency.',
+                        'Pour into a tall glass and serve immediately for maximum vitamins.'
+                    ]
+                }
+            },
+            6: {
+                img: 'dish6.png',
+                ro: {
+                    title: 'Friptură de Vită cu Cartofi Dulci',
+                    cals: '520 kcal',
+                    time: '30 min',
+                    protein: '48g',
+                    ingredients: [
+                        '200g Mușchi slab de vită',
+                        '1 Cartof dulce mediu, curățat și tăiat cuburi',
+                        '1 Mână de sparanghel proaspăt',
+                        '1 lingură Ulei de măsline extravirgin',
+                        'Sare grunjoasă, piper negru, boia afumată',
+                        '1 Cubuleț mic de unt (opțional)'
+                    ],
+                    instructions: [
+                        'Preîncălzește cuptorul la 200°C. Amestecă cuburile de cartof dulce cu puțin ulei, sare și boia afumată. Coace-le pe o tavă 20-25 minute.',
+                        'Scoate carnea de vită la temperatura camerei cu 15 minute înainte. Asezonează generos cu sare grunjoasă și piper pe ambele părți.',
+                        'Încinge bine o tigaie tip grill. Adaugă puțin ulei și gătește carnea (aproximativ 3-4 minute pe parte pentru medium-rare).',
+                        'În ultimele 2 minute, adaugă sparanghelul în tigaie și cubulețul de unt peste carne.',
+                        'Scoate carnea și las-o să se odihnească 5 minute înainte de a o tăia felii. Servește alături de cartofii dulci și sparanghel.'
+                    ]
+                },
+                en: {
+                    title: 'Steak Dinner with Sweet Potatoes',
+                    cals: '520 kcal',
+                    time: '30 min',
+                    protein: '48g',
+                    ingredients: [
+                        '200g Lean beef steak',
+                        '1 Medium sweet potato, peeled and cubed',
+                        '1 Handful fresh asparagus',
+                        '1 tbsp Extra virgin olive oil',
+                        'Coarse salt, black pepper, smoked paprika',
+                        '1 small knob of butter (optional)'
+                    ],
+                    instructions: [
+                        'Preheat oven to 200°C. Toss sweet potato cubes with a little oil, salt, and paprika. Roast on a tray for 20-25 minutes.',
+                        'Take the steak out to room temperature 15 minutes prior. Season generously with coarse salt and pepper on both sides.',
+                        'Heat a grill pan until smoking hot. Add a little oil and cook the steak (about 3-4 minutes per side for medium-rare).',
+                        'In the last 2 minutes, add asparagus to the pan and the knob of butter over the steak.',
+                        'Remove the steak and let it rest for 5 minutes before slicing. Serve alongside the sweet potatoes and asparagus.'
+                    ]
+                }
+            }
+        };
+
+        const modalOverlay = document.getElementById('recipeModal');
+        
+        function openRecipe(id) {
+            const lang = localStorage.getItem('heliosLang') || 'ro';
+            const recipe = recipesDB[id];
+            const data = recipe[lang];
+            
+            document.getElementById('modalImg').src = recipe.img;
+            document.getElementById('modalTitle').innerText = data.title;
+            document.getElementById('modalCals').innerText = data.cals;
+            document.getElementById('modalTime').innerText = data.time;
+            document.getElementById('modalProtein').innerText = data.protein;
+            
+            // Populate Ingredients
+            const ingList = document.getElementById('modalIngredients');
+            ingList.innerHTML = '';
+            data.ingredients.forEach(ing => {
+                let li = document.createElement('li');
+                li.innerHTML = `<i class="fa-solid fa-check"></i> <span>${ing}</span>`;
+                ingList.appendChild(li);
+            });
+            
+            // Populate Instructions
+            const instList = document.getElementById('modalInstructions');
+            instList.innerHTML = '';
+            data.instructions.forEach(step => {
+                let li = document.createElement('li');
+                li.innerText = step;
+                instList.appendChild(li);
+            });
+            
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+        
+        function closeRecipe() {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close modal if clicked outside content
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                closeRecipe();
+            }
+        });
+
+
+    </script>
+</body>
+
+</html>
