@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.cohere.com)",
+      "WebFetch(domain:www.npmjs.com)"
+    ]
+  }
+}
