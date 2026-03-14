@@ -1,39 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Helios Prime
+
+AI-powered fitness companion — calorie tracking, workout planning, body analysis, fasting, and more.
+
+## Features
+
+- **Dashboard** — Daily calorie ring, macros breakdown, water tracker, energy level logging
+- **Food Diary** — Log meals across 4 categories (breakfast, lunch, dinner, snacks) with manual entry, AI food photo scanning, barcode lookup, and custom recipes
+- **AI Food Scanner** — Take a photo of your meal and get instant calorie/macro estimates (Cohere vision AI)
+- **Barcode Scanner** — Scan product barcodes to auto-fill nutrition data (Open Food Facts API)
+- **Recipe Builder** — Create and save custom recipes with per-serving macro calculations
+- **Workout Planner** — Build custom workout plans with 60+ exercises, track active sessions with set/rep logging
+- **AI Workout Generator** — Generate personalized workout plans based on your goals and equipment
+- **Progress Tracking** — Weight log with trend charts, body measurements, nutrition trend analysis
+- **AI Health Score** — Weekly health score based on your nutrition adherence, workouts, and habits
+- **AI Body Analysis** — Upload a photo for AI-powered physique assessment with muscle balance and recommendations
+- **Fasting Tracker** — Intermittent fasting timer with presets (16:8, 18:6, 20:4, OMAD), fasting zones, streaks, and history
+- **Community Feed** — Share achievements, view posts from other users, like and interact
+- **Coaching Directory** — Browse certified fitness coaches and nutritionists filtered by specialty
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router, TypeScript)
+- **Styling**: Tailwind CSS v4 with CSS variables
+- **State Management**: Zustand with localStorage persistence
+- **AI**: Cohere SDK (CohereClientV2) — text + vision models with mock fallback
+- **Barcode**: Open Food Facts API
+- **Icons**: Lucide React
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment Variables (optional)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env.local` file to enable AI features:
 
-## Learn More
+```
+COHERE_API_KEY=your_cohere_api_key
+```
 
-To learn more about Next.js, take a look at the following resources:
+Without an API key, the app uses mock data for all AI features.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
-# helios-prime
-App built for the 2026 ITFest hackathon
+```
+src/
+├── app/
+│   ├── (marketing)/     # Landing page
+│   ├── (auth)/          # Login & Register
+│   ├── (app)/           # Authenticated app pages
+│   │   ├── dashboard/
+│   │   ├── food-log/
+│   │   ├── workouts/
+│   │   ├── fasting/
+│   │   ├── progress/
+│   │   ├── community/
+│   │   ├── coaches/
+│   │   ├── settings/
+│   │   └── onboarding/
+│   └── api/ai/          # AI API routes (scan-food, generate-workout, health-score, body-analysis)
+├── components/          # Feature components (food, workout, progress, onboarding)
+├── stores/              # Zustand stores (auth, food, recipe, workout, progress, fasting)
+└── lib/                 # Utilities, exercise library
+```

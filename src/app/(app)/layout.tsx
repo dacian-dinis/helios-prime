@@ -8,6 +8,9 @@ import {
   UtensilsCrossed,
   Dumbbell,
   TrendingUp,
+  Timer,
+  Users,
+  GraduationCap,
   Settings,
   LogOut,
 } from "lucide-react";
@@ -17,7 +20,10 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/food-log", label: "Food", icon: UtensilsCrossed },
   { href: "/workouts", label: "Workouts", icon: Dumbbell },
+  { href: "/fasting", label: "Fasting", icon: Timer },
   { href: "/progress", label: "Progress", icon: TrendingUp },
+  { href: "/community", label: "Community", icon: Users },
+  { href: "/coaches", label: "Coaches", icon: GraduationCap },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -88,7 +94,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Mobile bottom nav */}
       <nav className="fixed bottom-0 left-0 z-40 flex w-full border-t border-foreground/10 bg-background/95 backdrop-blur-md md:hidden">
-        {navItems.slice(0, 4).map((item) => {
+        {navItems.slice(0, 5).map((item) => {
           const active = pathname === item.href;
           return (
             <Link
