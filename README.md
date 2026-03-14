@@ -17,20 +17,19 @@ AI-powered fitness companion — calorie tracking, workout planning, body analys
 - **Fasting Tracker** — Intermittent fasting timer with presets (16:8, 18:6, 20:4, OMAD), fasting zones, streaks, and history
 - **Community Feed** — Share achievements, view posts from other users, like and interact
 - **Coaching Directory** — Browse certified fitness coaches and nutritionists filtered by specialty
+- **Settings** — Units, theme (light/dark/system), notification preferences
+- **Premium Paywall** — Free vs Pro plan with feature gating
+- **PWA** — Installable as a Progressive Web App with service worker caching
 
 ## Tech Stack
 
 - **Framework**: Next.js 16 (App Router, TypeScript)
 - **Styling**: Tailwind CSS v4 with CSS variables
-- **State Management**: Zustand with localStorage persistence
+- **Database**: Supabase (Postgres + Auth + RLS)
+- **State Management**: Zustand (synced with Supabase)
 - **AI**: Cohere SDK (CohereClientV2) — text + vision models with mock fallback
 - **Barcode**: Open Food Facts API
 - **Icons**: Lucide React
-=======
-# helios-prime
-App built for the 2026 ITFest hackathon
-
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
@@ -41,19 +40,25 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Environment Variables (optional)
+### Environment Variables
 
-Create a `.env.local` file to enable AI features:
+Create a `.env.local` file:
 
 ```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 COHERE_API_KEY=your_cohere_api_key
 ```
 
-Without an API key, the app uses mock data for all AI features.
+- Supabase URL and anon key are required for auth and data persistence.
+- Without a Cohere API key, the app uses mock data for all AI features.
+
+### Database Setup
+
+Run the SQL in `supabase/migration.sql` in your Supabase SQL Editor to create all tables, RLS policies, and triggers.
 
 ## Project Structure
 
-<<<<<<< HEAD
 ```
 src/
 ├── app/
@@ -67,18 +72,13 @@ src/
 │   │   ├── progress/
 │   │   ├── community/
 │   │   ├── coaches/
+│   │   ├── pricing/
 │   │   ├── settings/
 │   │   └── onboarding/
-│   └── api/ai/          # AI API routes (scan-food, generate-workout, health-score, body-analysis)
-├── components/          # Feature components (food, workout, progress, onboarding)
-├── stores/              # Zustand stores (auth, food, recipe, workout, progress, fasting)
-└── lib/                 # Utilities, exercise library
+│   └── api/
+│       ├── ai/          # AI routes (scan-food, generate-workout, health-score, body-analysis)
+│       └── barcode/     # Open Food Facts barcode lookup
+├── components/          # Feature components (food, workout, progress, onboarding, ui)
+├── stores/              # Zustand stores (auth, food, recipe, workout, progress, fasting, settings, subscription)
+└── lib/                 # Utilities, exercise library, Supabase client, notifications
 ```
-=======
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

@@ -3,6 +3,15 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
+import { useSettingsStore } from "@/stores/settings-store";
+import { useSubscriptionStore } from "@/stores/subscription-store";
+import { useFoodStore } from "@/stores/food-store";
+import { useRecipeStore } from "@/stores/recipe-store";
+import { useWorkoutStore } from "@/stores/workout-store";
+import { useProgressStore } from "@/stores/progress-store";
+import { useFastingStore } from "@/stores/fasting-store";
+import { NotificationScheduler } from "@/components/notification-scheduler";
+import { PWARegister } from "@/components/pwa-register";
 import {
   Home,
   UtensilsCrossed,
@@ -13,6 +22,7 @@ import {
   GraduationCap,
   Settings,
   LogOut,
+  Crown,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -24,6 +34,7 @@ const navItems = [
   { href: "/progress", label: "Progress", icon: TrendingUp },
   { href: "/community", label: "Community", icon: Users },
   { href: "/coaches", label: "Coaches", icon: GraduationCap },
+  { href: "/pricing", label: "Pricing", icon: Crown },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -37,6 +48,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [loadFromStorage]);
 
   useEffect(() => {
+    if (user) {
+      useSettingsStore.getState().loadFromStorage(user.id);
+      useSubscriptionStore.getState().loadSubscription(user.id);
+      useFoodStore.getState().loadFromStorage(user.id);
+      useRecipeStore.getState().loadFromStorage(user.id);
+      useWorkoutStore.getState().loadFromStorage(user.id);
+      useProgressStore.getState().loadFromStorage(user.id);
+      useFastingStore.getState().loadFromStorage(user.id);
+    }
+  }, [user]);
+
+  useEffect(() => {
     if (!isLoading && !user) router.push("/login");
   }, [user, isLoading, router]);
 
@@ -47,6 +70,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background">
+      <PWARegister />
+      <NotificationScheduler />
+
       {/* Desktop sidebar */}
       <aside className="fixed left-0 top-0 z-40 hidden h-screen w-56 flex-col border-r border-foreground/10 bg-background md:flex">
         <div className="px-5 py-5">
@@ -89,6 +115,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <main className="flex-1 md:ml-56">
+        {/* Mobile top bar */}
+        <div className="flex items-center justify-between border-b border-foreground/10 px-6 py-3 md:hidden">
+          <span className="text-sm font-bold tracking-tight">
+            <span className="text-accent">Helios</span> Prime
+          </span>
+          <Link
+            href="/settings"
+            className={`rounded-lg p-2 transition ${
+              pathname === "/settings"
+                ? "bg-accent/10 text-accent"
+                : "text-foreground/50 hover:bg-foreground/5 hover:text-foreground"
+            }`}
+          >
+            <Settings className="h-5 w-5" />
+          </Link>
+        </div>
         <div className="mx-auto max-w-4xl px-6 py-6">{children}</div>
       </main>
 

@@ -16,8 +16,15 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Explicit dark mode */
+:root.dark {
+  --background: #050505;
+  --foreground: #ededed;
+}
+
+/* System dark mode (only when no explicit light/dark class) */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
     --background: #050505;
     --foreground: #ededed;
   }

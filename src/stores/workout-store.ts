@@ -1,4 +1,7 @@
+"use client";
+
 import { create } from "zustand";
+import { supabase } from "@/lib/supabase";
 
 // --- Types ---
 
@@ -54,7 +57,7 @@ interface WorkoutState {
   sessions: WorkoutSession[];
   activeSession: WorkoutSession | null;
 
-  loadFromStorage: (userId: string) => void;
+  loadFromStorage: (userId: string) => Promise<void>;
   addPlan: (userId: string, plan: Omit<WorkoutPlan, "id" | "createdAt">) => WorkoutPlan;
   updatePlan: (userId: string, id: string, updates: Partial<Omit<WorkoutPlan, "id" | "createdAt">>) => void;
   deletePlan: (userId: string, id: string) => void;
@@ -70,14 +73,6 @@ interface WorkoutState {
   getRecentSessions: (limit?: number) => WorkoutSession[];
 }
 
-function storageKey(userId: string, type: string) {
-  return `hp_${type}_${userId}`;
-}
-
-function persist(userId: string, type: string, data: unknown) {
-  localStorage.setItem(storageKey(userId, type), JSON.stringify(data));
-}
-
 function genId() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
@@ -87,14 +82,55 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   sessions: [],
   activeSession: null,
 
-  loadFromStorage: (userId) => {
+  loadFromStorage: async (userId) => {
     try {
-      const plans = JSON.parse(localStorage.getItem(storageKey(userId, "workout_plans")) || "[]");
-      const sessions = JSON.parse(localStorage.getItem(storageKey(userId, "workout_sessions")) || "[]");
-      const active = JSON.parse(localStorage.getItem(storageKey(userId, "workout_active")) || "null");
-      set({ plans, sessions, activeSession: active });
-    } catch {
-      set({ plans: [], sessions: [], activeSession: null });
+      const [{ data: plans, error: e1 }, { data: sessions, error: e2 }, { data: active, error: e3 }] = await Promise.all([
+        supabase.from('workout_plans').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+        supabase.from('workout_sessions').select('*').eq('user_id', userId).order('completed_at', { ascending: false }),
+        supabase.from('workout_active').select('*').eq('user_id', userId),
+      ]);
+      if (e1) console.error('Failed to load workout plans:', e1.message);
+      if (e2) console.error('Failed to load workout sessions:', e2.message);
+      if (e3) console.error('Failed to load active workout:', e3.message);
+      set({
+        plans: (plans || []).map((p: Record<string, unknown>) => ({
+          id: p.id,
+          name: p.name,
+          description: p.description,
+          muscleGroups: p.muscle_groups,
+          exercises: p.exercises,
+          estimatedMinutes: p.estimated_minutes,
+          createdAt: p.created_at,
+        })) as WorkoutPlan[],
+        sessions: (sessions || []).map((s: Record<string, unknown>) => ({
+          id: s.id,
+          planId: s.plan_id,
+          planName: s.plan_name,
+          date: s.date,
+          startedAt: s.started_at,
+          completedAt: s.completed_at,
+          exercises: (s.session_data as Record<string, unknown>)?.exercises ?? s.exercises,
+          notes: (s.session_data as Record<string, unknown>)?.notes ?? s.notes,
+        })) as WorkoutSession[],
+        activeSession: active && active.length > 0
+          ? (() => {
+              const a = active[0] as Record<string, unknown>;
+              const sd = a.session_data as Record<string, unknown> | null;
+              return {
+                id: sd?.id ?? a.id,
+                planId: sd?.planId ?? a.plan_id,
+                planName: sd?.planName ?? a.plan_name,
+                date: sd?.date ?? a.date,
+                startedAt: sd?.startedAt ?? a.started_at,
+                completedAt: sd?.completedAt ?? a.completed_at,
+                exercises: sd?.exercises ?? [],
+                notes: sd?.notes,
+              } as WorkoutSession;
+            })()
+          : null,
+      });
+    } catch (err) {
+      console.error('Failed to load workout data:', err);
     }
   },
 
@@ -106,20 +142,37 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     };
     const plans = [...get().plans, newPlan];
     set({ plans });
-    persist(userId, "workout_plans", plans);
+    supabase.from('workout_plans').insert({
+      id: newPlan.id,
+      user_id: userId,
+      name: newPlan.name,
+      description: newPlan.description,
+      muscle_groups: newPlan.muscleGroups,
+      exercises: newPlan.exercises,
+      estimated_minutes: newPlan.estimatedMinutes,
+      created_at: newPlan.createdAt,
+    }).then(({ error }) => { if (error) console.error('Failed to add workout plan:', error.message); });
     return newPlan;
   },
 
   updatePlan: (userId, id, updates) => {
     const plans = get().plans.map((p) => (p.id === id ? { ...p, ...updates } : p));
     set({ plans });
-    persist(userId, "workout_plans", plans);
+    const snakeUpdates: Record<string, unknown> = {};
+    if (updates.name !== undefined) snakeUpdates.name = updates.name;
+    if (updates.description !== undefined) snakeUpdates.description = updates.description;
+    if (updates.muscleGroups !== undefined) snakeUpdates.muscle_groups = updates.muscleGroups;
+    if (updates.exercises !== undefined) snakeUpdates.exercises = updates.exercises;
+    if (updates.estimatedMinutes !== undefined) snakeUpdates.estimated_minutes = updates.estimatedMinutes;
+    supabase.from('workout_plans').update(snakeUpdates).eq('id', id)
+      .then(({ error }) => { if (error) console.error('Failed to update workout plan:', error.message); });
   },
 
   deletePlan: (userId, id) => {
     const plans = get().plans.filter((p) => p.id !== id);
     set({ plans });
-    persist(userId, "workout_plans", plans);
+    supabase.from('workout_plans').delete().eq('id', id)
+      .then(({ error }) => { if (error) console.error('Failed to delete workout plan:', error.message); });
   },
 
   startSession: (userId, plan) => {
@@ -142,7 +195,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       })),
     };
     set({ activeSession: session });
-    persist(userId, "workout_active", session);
+    supabase.from('workout_active').upsert({ user_id: userId, session_data: session })
+      .then(({ error }) => { if (error) console.error('Failed to save active session:', error.message); });
     return session;
   },
 
@@ -155,16 +209,18 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       exercises: [],
     };
     set({ activeSession: session });
-    persist(userId, "workout_active", session);
+    supabase.from('workout_active').upsert({ user_id: userId, session_data: session })
+      .then(({ error }) => { if (error) console.error('Failed to save active session:', error.message); });
     return session;
   },
 
   updateActiveSession: (userId, session) => {
     set({ activeSession: session });
-    persist(userId, "workout_active", session);
+    supabase.from('workout_active').upsert({ user_id: userId, session_data: session })
+      .then(({ error }) => { if (error) console.error('Failed to update active session:', error.message); });
   },
 
-  completeSession: (userId) => {
+  completeSession: async (userId) => {
     const active = get().activeSession;
     if (!active) return;
     const completed: WorkoutSession = {
@@ -173,19 +229,33 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     };
     const sessions = [completed, ...get().sessions];
     set({ sessions, activeSession: null });
-    persist(userId, "workout_sessions", sessions);
-    localStorage.removeItem(storageKey(userId, "workout_active"));
+    const { error: e1 } = await supabase.from('workout_sessions').insert({
+      id: completed.id,
+      user_id: userId,
+      plan_id: completed.planId,
+      plan_name: completed.planName,
+      date: completed.date,
+      started_at: completed.startedAt,
+      completed_at: completed.completedAt,
+      exercises: completed.exercises,
+      notes: completed.notes,
+    });
+    if (e1) console.error('Failed to save completed session:', e1.message);
+    const { error: e2 } = await supabase.from('workout_active').delete().eq('user_id', userId);
+    if (e2) console.error('Failed to clear active session:', e2.message);
   },
 
-  cancelSession: (userId) => {
+  cancelSession: async (userId) => {
     set({ activeSession: null });
-    localStorage.removeItem(storageKey(userId, "workout_active"));
+    const { error } = await supabase.from('workout_active').delete().eq('user_id', userId);
+    if (error) console.error('Failed to cancel session:', error.message);
   },
 
   deleteSession: (userId, id) => {
     const sessions = get().sessions.filter((s) => s.id !== id);
     set({ sessions });
-    persist(userId, "workout_sessions", sessions);
+    supabase.from('workout_sessions').delete().eq('id', id)
+      .then(({ error }) => { if (error) console.error('Failed to delete session:', error.message); });
   },
 
   getSessionsByDate: (date) => {

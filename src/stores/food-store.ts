@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { supabase } from "@/lib/supabase";
 
 export interface FoodEntry {
   id: string;
@@ -30,7 +31,7 @@ interface FoodState {
   entries: FoodEntry[];
   water: WaterEntry[];
   notes: DailyNote[];
-  loadFromStorage: (userId: string) => void;
+  loadFromStorage: (userId: string) => Promise<void>;
   addEntry: (userId: string, entry: Omit<FoodEntry, "id" | "createdAt">) => void;
   deleteEntry: (userId: string, id: string) => void;
   editEntry: (userId: string, id: string, updates: Partial<FoodEntry>) => void;
@@ -44,12 +45,8 @@ interface FoodState {
   getFrequentFoods: () => { name: string; entry: Omit<FoodEntry, "id" | "createdAt" | "date" | "mealType">; count: number }[];
 }
 
-function storageKey(userId: string, type: string) {
-  return `hp_${type}_${userId}`;
-}
-
-function persist(userId: string, type: string, data: unknown) {
-  localStorage.setItem(storageKey(userId, type), JSON.stringify(data));
+function genId() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
 export const useFoodStore = create<FoodState>((set, get) => ({
@@ -57,37 +54,92 @@ export const useFoodStore = create<FoodState>((set, get) => ({
   water: [],
   notes: [],
 
-  loadFromStorage: (userId) => {
-    const entries = JSON.parse(localStorage.getItem(storageKey(userId, "food")) || "[]");
-    const water = JSON.parse(localStorage.getItem(storageKey(userId, "water")) || "[]");
-    const notes = JSON.parse(localStorage.getItem(storageKey(userId, "notes")) || "[]");
-    set({ entries, water, notes });
+  loadFromStorage: async (userId) => {
+    try {
+      const [{ data: entries, error: e1 }, { data: water, error: e2 }, { data: notes, error: e3 }] = await Promise.all([
+        supabase.from('food_entries').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+        supabase.from('water_entries').select('*').eq('user_id', userId),
+        supabase.from('daily_notes').select('*').eq('user_id', userId),
+      ]);
+      if (e1) console.error('Failed to load food entries:', e1.message);
+      if (e2) console.error('Failed to load water entries:', e2.message);
+      if (e3) console.error('Failed to load daily notes:', e3.message);
+      set({
+        entries: (entries || []).map((e: Record<string, unknown>) => ({
+          id: e.id,
+          date: e.date,
+          mealType: e.meal_type,
+          name: e.name,
+          servingSize: e.serving_size,
+          calories: e.calories,
+          protein: e.protein,
+          carbs: e.carbs,
+          fat: e.fat,
+          createdAt: e.created_at,
+        })) as FoodEntry[],
+        water: (water || []).map((w: Record<string, unknown>) => ({
+          date: w.date,
+          ml: w.ml,
+        })) as WaterEntry[],
+        notes: (notes || []).map((n: Record<string, unknown>) => ({
+          date: n.date,
+          energyLevel: n.energy_level,
+          note: n.note,
+        })) as DailyNote[],
+      });
+    } catch (err) {
+      console.error('Failed to load food data:', err);
+    }
   },
 
-  addEntry: (userId, entry) => {
+  addEntry: async (userId, entry) => {
     const newEntry: FoodEntry = {
       ...entry,
-      id: Math.random().toString(36).slice(2) + Date.now().toString(36),
+      id: genId(),
       createdAt: new Date().toISOString(),
     };
     const entries = [...get().entries, newEntry];
     set({ entries });
-    persist(userId, "food", entries);
+    const { error } = await supabase.from('food_entries').insert({
+      id: newEntry.id,
+      user_id: userId,
+      date: newEntry.date,
+      meal_type: newEntry.mealType,
+      name: newEntry.name,
+      serving_size: newEntry.servingSize,
+      calories: newEntry.calories,
+      protein: newEntry.protein,
+      carbs: newEntry.carbs,
+      fat: newEntry.fat,
+      created_at: newEntry.createdAt,
+    });
+    if (error) console.error('Failed to add food entry:', error.message);
   },
 
-  deleteEntry: (userId, id) => {
+  deleteEntry: async (userId, id) => {
     const entries = get().entries.filter((e) => e.id !== id);
     set({ entries });
-    persist(userId, "food", entries);
+    const { error } = await supabase.from('food_entries').delete().eq('id', id);
+    if (error) console.error('Failed to delete food entry:', error.message);
   },
 
-  editEntry: (userId, id, updates) => {
+  editEntry: async (userId, id, updates) => {
     const entries = get().entries.map((e) => (e.id === id ? { ...e, ...updates } : e));
     set({ entries });
-    persist(userId, "food", entries);
+    const snakeUpdates: Record<string, unknown> = {};
+    if (updates.mealType !== undefined) snakeUpdates.meal_type = updates.mealType;
+    if (updates.servingSize !== undefined) snakeUpdates.serving_size = updates.servingSize;
+    if (updates.name !== undefined) snakeUpdates.name = updates.name;
+    if (updates.calories !== undefined) snakeUpdates.calories = updates.calories;
+    if (updates.protein !== undefined) snakeUpdates.protein = updates.protein;
+    if (updates.carbs !== undefined) snakeUpdates.carbs = updates.carbs;
+    if (updates.fat !== undefined) snakeUpdates.fat = updates.fat;
+    if (updates.date !== undefined) snakeUpdates.date = updates.date;
+    const { error } = await supabase.from('food_entries').update(snakeUpdates).eq('id', id);
+    if (error) console.error('Failed to edit food entry:', error.message);
   },
 
-  addWater: (userId, date, ml) => {
+  addWater: async (userId, date, ml) => {
     const water = [...get().water];
     const existing = water.find((w) => w.date === date);
     if (existing) {
@@ -95,19 +147,27 @@ export const useFoodStore = create<FoodState>((set, get) => ({
     } else {
       water.push({ date, ml });
     }
+    const newTotal = water.find((w) => w.date === date)!.ml;
     set({ water });
-    persist(userId, "water", water);
+    const { error } = await supabase.from('water_entries').upsert({ user_id: userId, date, ml: newTotal });
+    if (error) console.error('Failed to save water entry:', error.message);
   },
 
   getWater: (date) => {
     return get().water.find((w) => w.date === date)?.ml || 0;
   },
 
-  saveNote: (userId, note) => {
+  saveNote: async (userId, note) => {
     const notes = get().notes.filter((n) => n.date !== note.date);
     notes.push(note);
     set({ notes });
-    persist(userId, "notes", notes);
+    const { error } = await supabase.from('daily_notes').upsert({
+      user_id: userId,
+      date: note.date,
+      energy_level: note.energyLevel,
+      note: note.note,
+    });
+    if (error) console.error('Failed to save daily note:', error.message);
   },
 
   getNote: (date) => {

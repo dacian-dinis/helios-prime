@@ -24,7 +24,10 @@ import { useAuthStore } from "@/stores/auth-store";
 import { useFoodStore } from "@/stores/food-store";
 import { useWorkoutStore } from "@/stores/workout-store";
 import { useProgressStore, type WeightEntry, type BodyMeasurement } from "@/stores/progress-store";
+import { useSubscriptionStore, type ProFeature } from "@/stores/subscription-store";
+import { PaywallModal } from "@/components/paywall-modal";
 import BodyAnalysis from "@/components/progress/body-analysis";
+import { Crown } from "lucide-react";
 
 function today() {
   return new Date().toISOString().split("T")[0];
@@ -64,6 +67,8 @@ export default function ProgressPage() {
   const [showNutrition, setShowNutrition] = useState(true);
   const [showWorkoutStats, setShowWorkoutStats] = useState(true);
   const [showBodyAnalysis, setShowBodyAnalysis] = useState(false);
+  const [paywallFeature, setPaywallFeature] = useState<ProFeature | null>(null);
+  const { isPro } = useSubscriptionStore();
 
   useEffect(() => {
     if (user) {
@@ -235,7 +240,7 @@ export default function ProgressPage() {
               Get an AI-powered assessment based on your nutrition, workouts, and habits from the last 7 days.
             </p>
             <button
-              onClick={fetchHealthScore}
+              onClick={() => isPro() ? fetchHealthScore() : setPaywallFeature("ai-health-score")}
               disabled={loadingScore}
               className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-black transition hover:bg-accent-dark disabled:opacity-50"
             >
@@ -246,6 +251,7 @@ export default function ProgressPage() {
               ) : (
                 <>
                   <Sparkles className="h-3.5 w-3.5" /> Get My Score
+                  {!isPro() && <Crown className="h-3 w-3 text-amber-500" />}
                 </>
               )}
             </button>
@@ -255,14 +261,17 @@ export default function ProgressPage() {
 
       {/* AI Body Analysis */}
       <button
-        onClick={() => setShowBodyAnalysis(true)}
+        onClick={() => isPro() ? setShowBodyAnalysis(true) : setPaywallFeature("ai-body-analysis")}
         className="mb-5 flex w-full items-center gap-3 rounded-2xl border border-purple-500/20 bg-purple-500/5 p-4 text-left transition hover:bg-purple-500/10"
       >
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/10">
           <Camera className="h-5 w-5 text-purple-400" />
         </div>
-        <div>
-          <p className="text-sm font-semibold">AI Body Analysis</p>
+        <div className="flex-1">
+          <p className="text-sm font-semibold flex items-center gap-2">
+            AI Body Analysis
+            {!isPro() && <span className="rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-500">PRO</span>}
+          </p>
           <p className="text-[10px] text-foreground/40">
             Upload a photo for physique assessment &amp; personalized advice
           </p>
@@ -545,6 +554,11 @@ export default function ProgressPage() {
           }}
           onClose={() => setShowBodyAnalysis(false)}
         />
+      )}
+
+      {/* Paywall Modal */}
+      {paywallFeature && (
+        <PaywallModal feature={paywallFeature} onClose={() => setPaywallFeature(null)} />
       )}
     </div>
   );

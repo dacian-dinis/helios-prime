@@ -12,17 +12,13 @@ function today() {
 
 export default function DashboardPage() {
   const { user, profile, isLoading, loadFromStorage } = useAuthStore();
-  const { loadFromStorage: loadFood, getDailyTotals, getWater, addWater, getNote, saveNote } = useFoodStore();
+  const { getDailyTotals, getWater, addWater, getNote, saveNote } = useFoodStore();
   const router = useRouter();
   const [date] = useState(today());
 
   useEffect(() => {
     loadFromStorage();
   }, [loadFromStorage]);
-
-  useEffect(() => {
-    if (user) loadFood(user.id);
-  }, [user, loadFood]);
 
   useEffect(() => {
     if (!isLoading && user && !profile?.onboardingComplete) {

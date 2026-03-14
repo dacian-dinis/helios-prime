@@ -15,6 +15,9 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
 import { useWorkoutStore } from "@/stores/workout-store";
+import { useSubscriptionStore, type ProFeature } from "@/stores/subscription-store";
+import { PaywallModal } from "@/components/paywall-modal";
+import { Crown } from "lucide-react";
 import PlanBuilder from "@/components/workout/plan-builder";
 import ActiveSession from "@/components/workout/active-session";
 import WorkoutHistory from "@/components/workout/workout-history";
@@ -27,7 +30,6 @@ export default function WorkoutsPage() {
   const {
     plans,
     activeSession,
-    loadFromStorage,
     startSession,
     startEmptySession,
     deletePlan,
@@ -37,10 +39,8 @@ export default function WorkoutsPage() {
   const [showBuilder, setShowBuilder] = useState(false);
   const [editPlanId, setEditPlanId] = useState<string | undefined>();
   const [showAI, setShowAI] = useState(false);
-
-  useEffect(() => {
-    if (user) loadFromStorage(user.id);
-  }, [user, loadFromStorage]);
+  const [paywallFeature, setPaywallFeature] = useState<ProFeature | null>(null);
+  const { isPro } = useSubscriptionStore();
 
   if (!user || !profile) return null;
 
@@ -110,14 +110,17 @@ export default function WorkoutsPage() {
         <>
           {/* AI Generate button */}
           <button
-            onClick={() => setShowAI(true)}
+            onClick={() => isPro() ? setShowAI(true) : setPaywallFeature("ai-workout-generator")}
             className="mb-4 flex w-full items-center gap-3 rounded-xl border border-accent/20 bg-accent/5 p-4 text-left transition hover:bg-accent/10"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
               <Sparkles className="h-5 w-5 text-accent" />
             </div>
-            <div>
-              <p className="text-sm font-semibold">AI Workout Generator</p>
+            <div className="flex-1">
+              <p className="text-sm font-semibold flex items-center gap-2">
+                AI Workout Generator
+                {!isPro() && <span className="rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-500">PRO</span>}
+              </p>
               <p className="text-[10px] text-foreground/40">
                 Get personalized plans based on your goals
               </p>
@@ -251,6 +254,11 @@ export default function WorkoutsPage() {
           }}
           onClose={() => setShowAI(false)}
         />
+      )}
+
+      {/* Paywall Modal */}
+      {paywallFeature && (
+        <PaywallModal feature={paywallFeature} onClose={() => setPaywallFeature(null)} />
       )}
     </div>
   );

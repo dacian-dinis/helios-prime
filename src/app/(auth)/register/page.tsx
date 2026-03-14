@@ -22,14 +22,14 @@ export default function RegisterPage() {
     }
   }, [user, isLoading, router]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (password.length < 6) {
       setError("Password must be at least 6 characters");
       return;
     }
-    const success = register(name, email, password);
+    const success = await register(name, email, password);
     if (!success) {
       setError("An account with this email already exists");
       return;

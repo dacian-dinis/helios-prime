@@ -113,8 +113,11 @@ export default function OnboardingPage() {
     }
   };
 
-  const finish = () => {
-    updateProfile({
+  const [saving, setSaving] = useState(false);
+
+  const finish = async () => {
+    setSaving(true);
+    await updateProfile({
       gender: gender as "male" | "female" | "other",
       dateOfBirth: dob,
       heightCm,
@@ -243,9 +246,10 @@ export default function OnboardingPage() {
           {step === 13 ? (
             <button
               onClick={finish}
-              className="w-full rounded-xl bg-accent py-3.5 text-sm font-semibold text-black transition hover:bg-accent-dark"
+              disabled={saving}
+              className="w-full rounded-xl bg-accent py-3.5 text-sm font-semibold text-black transition hover:bg-accent-dark disabled:opacity-50"
             >
-              Let&apos;s Go! →
+              {saving ? "Saving..." : "Let\u2019s Go! \u2192"}
             </button>
           ) : (
             <button
