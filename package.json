@@ -9,6 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@capacitor/app": "^8.0.1",
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/core": "^8.2.0",
+    "@capacitor/haptics": "^8.0.1",
+    "@capacitor/keyboard": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.1",
     "@ericblade/quagga2": "^1.12.1",
     "@hookform/resolvers": "^5.2.2",
     "@supabase/supabase-js": "^2.99.1",
