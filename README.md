@@ -57,6 +57,14 @@ COHERE_API_KEY=your_cohere_api_key
 
 Run the SQL in `supabase/migration.sql` in your Supabase SQL Editor to create all tables, RLS policies, and triggers.
 
+## Available On All Platforms
+
+- **Web** — Next.js progressive web app, works on any browser
+- **iOS** — Native app built with SwiftUI
+- **Android** — Native app built with Kotlin Jetpack Compose
+
+One Supabase backend powers every platform — your data syncs seamlessly across all your devices.
+
 ## Project Structure
 
 ```
