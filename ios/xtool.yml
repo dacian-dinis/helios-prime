@@ -1,0 +1,4 @@
+version: 1
+bundleID: com.helios.prime
+displayName: Helios Prime
+deploymentTarget: "17.0"

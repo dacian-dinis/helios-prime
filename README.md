@@ -23,6 +23,8 @@ AI-powered fitness companion — calorie tracking, workout planning, body analys
 
 ## Tech Stack
 
+### Web
+
 - **Framework**: Next.js 16 (App Router, TypeScript)
 - **Styling**: Tailwind CSS v4 with CSS variables
 - **Database**: Supabase (Postgres + Auth + RLS)
@@ -31,7 +33,19 @@ AI-powered fitness companion — calorie tracking, workout planning, body analys
 - **Barcode**: Open Food Facts API
 - **Icons**: Lucide React
 
+### iOS
+
+- **UI**: SwiftUI (iOS 17+)
+- **Language**: Swift 6.0
+- **State Management**: `@Observable` (Observation framework)
+- **Networking**: URLSession with async/await
+- **Persistence**: JSON file storage in app documents directory
+- **AI**: Anthropic Claude & OpenAI GPT API integration via REST
+- **Build Tool**: [xtool](https://github.com/xtool-org/xtool) — cross-platform Xcode replacement (builds from Linux/WSL, deploys to physical device via USB)
+
 ## Getting Started
+
+### Web
 
 ```bash
 npm install
@@ -40,7 +54,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Environment Variables
+#### Environment Variables
 
 Create a `.env.local` file:
 
@@ -53,9 +67,20 @@ COHERE_API_KEY=your_cohere_api_key
 - Supabase URL and anon key are required for auth and data persistence.
 - Without a Cohere API key, the app uses mock data for all AI features.
 
-### Database Setup
+#### Database Setup
 
 Run the SQL in `supabase/migration.sql` in your Supabase SQL Editor to create all tables, RLS policies, and triggers.
+
+### iOS
+
+Requires [xtool](https://github.com/xtool-org/xtool) and a physical iOS device connected via USB.
+
+```bash
+cd ios
+xtool dev
+```
+
+This will compile, sign, install, and launch the app on the connected device. Configure your AI API key (Anthropic or OpenAI) in the app's Settings screen after first launch.
 
 ## Available On All Platforms
 
@@ -66,6 +91,8 @@ Run the SQL in `supabase/migration.sql` in your Supabase SQL Editor to create al
 One Supabase backend powers every platform — your data syncs seamlessly across all your devices.
 
 ## Project Structure
+
+### Web (`src/`)
 
 ```
 src/
@@ -89,4 +116,35 @@ src/
 ├── components/          # Feature components (food, workout, progress, onboarding, ui)
 ├── stores/              # Zustand stores (auth, food, recipe, workout, progress, fasting, settings, subscription)
 └── lib/                 # Utilities, exercise library, Supabase client, notifications
+```
+
+### iOS (`ios/`)
+
+```
+ios/
+├── Package.swift                          # SwiftPM manifest (Swift 6.0, iOS 17+)
+├── xtool.yml                              # xtool build config (bundle ID, display name)
+└── Sources/HeliosPrime/
+    ├── HeliosPrimeApp.swift               # @main entry point
+    ├── ContentView.swift                  # Tab-based root navigation
+    ├── Models/
+    │   ├── FoodEntry.swift                # Meal data model with macros
+    │   ├── UserProfile.swift              # Profile, TDEE calc, goals
+    │   ├── WorkoutModels.swift            # 60+ exercises, plans, sessions
+    │   ├── FastingModels.swift            # Fasting presets, zones, sessions
+    │   └── ProgressModels.swift           # Weight entries, body measurements
+    ├── Services/
+    │   ├── AIService.swift                # Anthropic & OpenAI API integration
+    │   └── PersistenceService.swift       # JSON file-based local storage
+    ├── ViewModels/
+    │   └── AppState.swift                 # @Observable centralized app state
+    └── Views/
+        ├── Dashboard/DashboardView.swift
+        ├── FoodLog/                       # Food logging + AI food analysis
+        ├── Workouts/                      # Plans, sessions, AI workout gen
+        ├── Fasting/FastingView.swift      # Timer, presets, history
+        ├── Progress/ProgressView.swift    # Weight, measurements, trends
+        ├── Settings/SettingsView.swift    # Profile, goals, AI config
+        ├── Onboarding/OnboardingView.swift
+        └── Components/CalorieRingView.swift
 ```
