@@ -90,6 +90,7 @@ This will compile, sign, install, and launch the app on the connected device. Co
 
 One Supabase backend powers every platform — your data syncs seamlessly across all your devices.
 
+## Project Structure
 
 ### Web (`src/`)
 
